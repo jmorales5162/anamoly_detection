@@ -34,7 +34,6 @@ def fig_prod_month():
 def prod_week():
     cfg.dt_p1_sens['DAY_OF_WEEK'] = cfg.dt_p1_sens['DATE_TIME'].dt.dayofweek + 1
     cfg.dt_p1_sens['HOUR'] = cfg.dt_p1_sens['DATE_TIME'].dt.hour
-
     pivot_temp = cfg.dt_p1_sens.groupby(['HOUR', 'DAY_OF_WEEK'])['AMBIENT_TEMPERATURE'].mean().unstack()
 
     plt.figure(figsize=(20, 8))
@@ -44,12 +43,17 @@ def prod_week():
     plt.ylabel('Hour of Day')
     plt.show()
 
-def matrix_corr():
-    cfg.dt_p1_sens.set_index('DATE_TIME', inplace=True)
-    cfg.dt_p1_gen.set_index('DATE_TIME', inplace=True)
+def matrix_corr(data_sens , data_gen):
+    """
+    matrix_corr(data_sens , data_gen)
+    creada para mostrar la correlacion entre las variables sensadas y las producidas
 
-    merged_data = cfg.dt_p1_sens[['AMBIENT_TEMPERATURE', 'MODULE_TEMPERATURE', 'IRRADIATION']].merge(
-        cfg.dt_p1_gen[['DC_POWER', 'AC_POWER', 'DAILY_YIELD']], 
+    """
+    data_sens.set_index('DATE_TIME', inplace=True)
+    data_gen.set_index('DATE_TIME', inplace=True)
+
+    merged_data = data_sens[['AMBIENT_TEMPERATURE', 'MODULE_TEMPERATURE', 'IRRADIATION']].merge(
+        data_gen[['DC_POWER', 'AC_POWER', 'DAILY_YIELD']], 
         left_index=True, 
         right_index=True,
         how='inner'
@@ -60,5 +64,19 @@ def matrix_corr():
     plt.figure(figsize=(10, 8))
     sns.heatmap(correlation_matrix_english, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
     plt.title('Correlation Matrix of Key Variables')
+    plt.show()
+
+def prod_per_src():
+    """
+    Muestra la produccion de cada fuente (SOURCE_KEY)
+    """
+    plt.figure(figsize=(15,7))
+    sns.boxplot(x=cfg.dt_p1_gen['SOURCE_KEY'], y=cfg.dt_p1_gen['DAILY_YIELD'], palette="Blues")
+    plt.xticks(rotation=90)
+    plt.title('Daily Production Density per Source')
+    plt.xlabel('Source Key')
+    plt.ylabel('Daily Production (kW)')
+    plt.grid(True, axis='y')
+    plt.tight_layout()
     plt.show()
 

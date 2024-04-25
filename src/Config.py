@@ -14,3 +14,7 @@ dt_p1_sens['DATE_TIME'] = pd.to_datetime(dt_p1_sens['DATE_TIME'], format='%Y-%m-
 dt_p2_gen['DATE_TIME'] = pd.to_datetime(dt_p2_gen['DATE_TIME'], format='%Y-%m-%d %H:%M:%S')
 dt_p2_sens['DATE_TIME'] = pd.to_datetime(dt_p2_sens['DATE_TIME'], format='%Y-%m-%d %H:%M:%S')
 
+#dt_source_key_specifico = dt_p1_gen.loc[dt_p1_gen['SOURCE_KEY'] == '1BY6WEcLGh8j5v7']
+
+reduced_df = dt_p1_gen.groupby(['SOURCE_KEY', pd.Grouper(key='DATE_TIME', freq='15min')]).first().reset_index()
+reduced_df.to_excel("ki.xlsx", index=False)
