@@ -1,3 +1,7 @@
+import tensorflow as tf
+from tensorflow.keras.models import Model
+
+
 class AutoEncoder(Model):
   def __init__(self):
     super(AutoEncoder, self).__init__()
