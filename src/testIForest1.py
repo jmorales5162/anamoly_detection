@@ -9,6 +9,12 @@ from pathlib import Path
 from sklearn.cluster import KMeans
 
 
+# AutoEncoder
+import tensorflow as tf
+from tensorflow.keras.models import Model
+from sklearn.model_selection import train_test_split
+
+
 
 
 
@@ -83,7 +89,7 @@ def kmeans(data):
     # Calculate the distance from each point to its assigned cluster center
     distances = [np.linalg.norm(x - cluster_centers[cluster]) for x, cluster in zip(data, cluster_labels)]
     # Define a threshold for anomaly detection (e.g., based on the distance percentile)
-    percentile_threshold = 95
+    percentile_threshold = 99.5
     threshold_distance = np.percentile(distances, percentile_threshold)
 
     # Identify anomalies
@@ -93,15 +99,20 @@ def kmeans(data):
     # Printing the clusters
     colors = cm.nipy_spectral(cluster_labels.astype(float) / 3)
     plt.scatter(data[:, 0], data[:, 1], marker='.', s=50, lw=0, alpha=0.7,c=colors, edgecolor='k')
-    plt.scatter(anomalies[:, 0], anomalies[:, 1], color='purple', marker='.', s=50, label='Anomalies')
+    plt.scatter(anomalies[:, 0], anomalies[:, 1], color='red', marker='.', s=50, label='Anomalies')
     plt.show()
 
+
+
+def autoEncoder(data):
+    x_train, x_test, y_train, y_test = train_test_split(data.values, data.values[:,0:1], test_size=0.2, random_state=111)
 
 if __name__ == "__main__":
 
     x1, x2 = load_data(Config2.path)
  
     #isolationForest(x1.to_numpy())
-    kmeans(x1.to_numpy())
+    #kmeans(x1.to_numpy())
+    autoEncoder(data)
 
 
