@@ -42,14 +42,14 @@ def isolationForest(data):
         ax = fig.add_subplot(1, 3, i+1)
         ax.scatter(data[resultados[i]==-1][:, 0], 
                data[resultados[i]==-1][:, 1], 
-               c="skyblue", marker="s", s=500)
+               c="skyblue", marker="s", s=50)
         ax.scatter(data[:, 0], 
                data[:, 1], 
                c=range(data.size//2), marker="x",
-               s=500, alpha=0.6)
+               s=50, alpha=0.6)
         ax.set_title("Contaminación: %0.2f" % c[i], size=18, color="purple")
-        ax.set_ylabel("Precio ($)", size=10)
-        ax.set_xlabel("Kms recorridos", size=14)
+        ax.set_ylabel("Radiacion", size=8)
+        ax.set_xlabel("Watts", size=8)
 
     plt.show()
 
