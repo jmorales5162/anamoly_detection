@@ -107,7 +107,7 @@ def kmeans(data):
 
 def autoEncoder(data):
     x_train, x_test, y_train, y_test = train_test_split(data.values, data.values[:,0:1], test_size=0.2, random_state=111)
-    AutoEncoder()
+    model = AutoEncoder()
 
     early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=2, mode="min")
     model.compile(optimizer='adam', loss="mae")
