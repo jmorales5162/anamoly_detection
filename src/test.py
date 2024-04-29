@@ -14,7 +14,7 @@ for i in range(len(c)):
     modelo = IsolationForest(contamination=c[i]).fit(carros)
     resultados[i] = modelo.predict(carros)
     
-# Graficar datos anómalos 
+# Graficar datos anomalos 
 plt.set_cmap("jet")
 fig = plt.figure(figsize=(13, 4))
 
