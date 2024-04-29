@@ -1,3 +1,4 @@
 import os
 datasetName = "datasetProba"
-path = os.path.join(os.path.dirname(__file__), datasetName)
+fileName = "todo.csv"
+path = os.path.join(os.path.dirname(__file__), datasetName, fileName)
