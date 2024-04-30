@@ -35,7 +35,8 @@ def normalize_data(df):
     new_max = 1
 
     # Normalize the DataFrame from -1 to 1 to 0 to 1
-    normalized_df = (df + 1) / 2 * (new_max - new_min) + new_min
+    #normalized_df = (df + 1) / 2 * (new_max - new_min) + new_min
+    normalized_df = (df - df.min()) / (df.max() - df.min())
     return normalized_df
 
 """
@@ -250,7 +251,22 @@ def polynomialRegressionModel2(data):
 
 
 def graficarRelacionVariables():
-    pass
+    df = normalize_data(pd.read_csv(Config2.path))
+    print("Max: " + str(df[['radiation']].max()))
+    X_radiation = df[['radiation']].to_numpy()
+    X_temperature = df[['temperature']].to_numpy()
+    Y_potencia = df[['W']].to_numpy()
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    ax1.scatter(X_radiation, Y_potencia.flatten(), label="Prediction", color='red')
+    ax1.set_xlabel('Radiacion'); ax1.set_ylabel('Produccion')
+    ax1.set_title('Produccion Solar')
+
+    ax2.scatter(X_temperature, Y_potencia.flatten(), label="Real", color='blue')
+    ax2.set_xlabel('Temperatura'); ax2.set_ylabel('Produccion')
+    ax2.set_title('Produccion Solar')
+    plt.tight_layout()
+    plt.show()
 
 
 def gradientBoosting(data):
@@ -273,6 +289,10 @@ if __name__ == "__main__":
     x1 = load_data(Config2.path)
 
 
+    # Estudio do conxunto de datos
+    graficarRelacionVariables()
+
+
 
     # Tecnicas de deteccion de anomalias
 
@@ -281,11 +301,14 @@ if __name__ == "__main__":
     #autoEncoder2(x1.to_numpy())
     
 
+
+
+
     # Regresion
 
     x2 = load_data2(Config2.path)
 
-    linearRegressionModel(x1)
+    #linearRegressionModel(x1)
     #polynomialRegressionModel(x2)
 
 
