@@ -8,6 +8,7 @@ import Config2
 from pathlib import Path
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
 
 # AutoEncoder
@@ -212,16 +213,65 @@ def linearRegressionModel(data):
     plt.show()
 
 
-def logisticRegressionModel(data):
-    pass
-
-
 def polynomialRegressionModel(data):
+    X = data[['radiation']].to_numpy()
+    Y = data[['W']].to_numpy()
+    poly = PolynomialFeatures(degree=3, include_bias=False)
+    poly_features = poly.fit_transform(X)
+
+    poly_reg_model = LinearRegression()
+    poly_reg_model.fit(poly_features, Y)
+    y_predicted = poly_reg_model.predict(poly_features)
+    plt.figure(figsize=(10, 6))
+    plt.title("Your first polynomial regression – congrats! :)", size=16)
+    plt.scatter(X,Y)
+    plt.plot(X, y_predicted, c="red")
+    plt.show()
+    #X_train, X_test, y_train, y_test = train_test_split(poly_features, y, test_size=0.3, random_state=42)
+
+
+def polynomialRegressionModel2(data):
+    X = data[['radiation']].to_numpy()
+    Y = data[['W']].to_numpy()
+    poly = PolynomialFeatures(degree=3, include_bias=False)
+    poly_features = poly.fit_transform(X)
+
+    poly_reg_model = LinearRegression()
+    poly_reg_model.fit(poly_features, Y)
+    y_predicted = poly_reg_model.predict(poly_features)
+    plt.figure(figsize=(10, 6))
+    plt.title("Your first polynomial regression – congrats! :)", size=16)
+    plt.scatter(X,Y)
+    plt.plot(X, y_predicted, c="red")
+    plt.show()
+    #X_train, X_test, y_train, y_test = train_test_split(poly_features, y, test_size=0.3, random_state=42)
+
+
+
+
+def graficarRelacionVariables():
     pass
+
+
+def gradientBoosting(data):
+    pass
+
+def randomForest(data):
+    pass
+
+
+
+def load_data2(path):
+    df1 = pd.read_csv(path)
+    return normalize_data(df1[['W', 'radiation', 'temperature']])
+
+
+
 
 if __name__ == "__main__":
 
     x1 = load_data(Config2.path)
+
 
 
     # Tecnicas de deteccion de anomalias
@@ -232,6 +282,10 @@ if __name__ == "__main__":
     
 
     # Regresion
+
+    x2 = load_data2(Config2.path)
+
     linearRegressionModel(x1)
+    #polynomialRegressionModel(x2)
 
 
