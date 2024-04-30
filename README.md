@@ -1,4 +1,4 @@
-# final_project_aa2
+# Anamoly detection 
 
 ## Dataset Kaggle:
 https://www.kaggle.com/datasets/anikannal/solar-power-generation-data
