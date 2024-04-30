@@ -11,8 +11,9 @@ from sklearn.cluster import KMeans
 
 # AutoEncoder
 import tensorflow as tf
-from tensorflow.keras.models import Model
+from tensorflow.keras import models, layers
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from autoencoder import AutoEncoder
 
 
@@ -24,8 +25,7 @@ def load_data(path):
     selected_columns = ['W', 'radiation']
     df = df1[selected_columns] 
     df = normalize_data(df)
-    return df,df1[selected_columns]
-
+    return df
 
 
 def normalize_data(df):
@@ -149,12 +149,63 @@ def autoEncoder(data):
     plt.show()
 
 
+def autoEncoder2(data):
+    x_train, x_test, y_train, y_test = train_test_split(data, data[:,0:1], test_size=0.2, random_state=111)
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(x_train)
+    X_test_scaled = scaler.fit_transform(x_test)
+    autoencoder = models.Sequential()
+    autoencoder.add(layers.Dense(1, input_shape=X_train_scaled.shape[1:], activation='relu'))
+    autoencoder.add(layers.Dense(2))
+    autoencoder.compile(optimizer='adam', loss='mse')
+    autoencoder.summary()
+    history = autoencoder.fit(X_train_scaled, X_train_scaled, 
+          epochs=30, 
+          batch_size=100,
+          validation_data=(X_test_scaled, X_test_scaled),
+          shuffle=True)
+    
+    mse_train = tf.keras.losses.mse(autoencoder.predict(X_train_scaled), X_train_scaled)
+    umbral = np.max(mse_train)
+
+    plt.figure(figsize=(12,4))
+    plt.hist(mse_train, bins=50)
+    plt.xlabel("Error de reconstrucción (entrenamiento)")
+    plt.ylabel("Número de datos")
+    plt.axvline(umbral, color='r', linestyle='--')
+    plt.legend(["Umbral"], loc="upper center")
+    plt.show()
+    e_test = autoencoder.predict(X_test_scaled)
+
+    mse_test = np.mean(np.power(X_test_scaled - e_test, 2), axis=1)
+    plt.figure(figsize=(12,4))
+    plt.plot(range(1,X_train_scaled.shape[0]+1),mse_train,'b.')
+    plt.plot(range(X_train_scaled.shape[0]+1,X_train_scaled.shape[0]+X_test_scaled.shape[0]+1),mse_test,'r.')
+    plt.axhline(umbral, color='r', linestyle='--')
+    plt.xlabel('Índice del dato')
+    plt.ylabel('Error de reconstrucción');
+    plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
+    plt.show()
+
 if __name__ == "__main__":
 
-    x1, x2 = load_data(Config2.path)
- 
+    x1 = load_data(Config2.path)
+
+
     #isolationForest(x1.to_numpy())
     #kmeans(x1.to_numpy())
-    autoEncoder(data)
+    autoEncoder2(x1.to_numpy())
+    
+    #df = pd.read_csv('spx.csv', parse_dates=['date'], index_col='date')
+    #df.head()
+  
+
+    #x1 = x1.add_prefix('c')
+    #print(x1)
+    #print(x1)
+    #print(x1.query('W > 0.299249'))
+    #print(x1.query('W == 0.199249').values[:,1:])
+    #x1['c0'].value_counts()
+    #autoEncoder(x1)
 
 
