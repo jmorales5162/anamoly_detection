@@ -7,6 +7,7 @@ import os
 import Config2
 from pathlib import Path
 from sklearn.cluster import KMeans
+from sklearn.linear_model import LinearRegression
 
 
 # AutoEncoder
@@ -36,7 +37,7 @@ def normalize_data(df):
     normalized_df = (df + 1) / 2 * (new_max - new_min) + new_min
     return normalized_df
 
-
+"""
 def d3plot():
     plt.rcParams["figure.figsize"] = [7.00, 3.50]
     plt.rcParams["figure.autolayout"] = True
@@ -46,7 +47,7 @@ def d3plot():
     z, x, y = data.nonzero()
     ax.scatter(x, y, z, c=z, alpha=1)
     plt.show()
-
+"""
 
 def isolationForest(data):
     resultados = np.zeros((3, data.shape[0])) # (3,52547)
@@ -187,25 +188,50 @@ def autoEncoder2(data):
     plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
     plt.show()
 
+
+
+def linearRegressionModel(data):
+    reg = LinearRegression()
+    X = np.array([data['radiation'].values])
+    Y = np.array([data['W'].values])
+    X = X.transpose(); Y = Y.transpose()
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
+    print("Shapes: X=" + str(X_train.shape) + " Y=" + str(y_train.shape))
+    reg = reg.fit(X_train,y_train)
+    Y_pred = reg.predict(X_test)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    ax1.scatter(X_test, Y_pred.flatten(), label="Prediction", color='red')
+    ax1.set_xlabel('Radiacion'); ax1.set_ylabel('Produccion')
+    ax1.set_title('Produccion Solar')
+
+    ax2.scatter(X_test, y_test.flatten(), label="Real", color='blue')
+    ax2.set_xlabel('Radiacion'); ax2.set_ylabel('Produccion')
+    ax2.set_title('Produccion Solar')
+    plt.tight_layout()
+    plt.show()
+
+
+def logisticRegressionModel(data):
+    pass
+
+
+def polynomialRegressionModel(data):
+    pass
+
 if __name__ == "__main__":
 
     x1 = load_data(Config2.path)
 
 
+    # Tecnicas de deteccion de anomalias
+
     #isolationForest(x1.to_numpy())
     #kmeans(x1.to_numpy())
-    autoEncoder2(x1.to_numpy())
+    #autoEncoder2(x1.to_numpy())
     
-    #df = pd.read_csv('spx.csv', parse_dates=['date'], index_col='date')
-    #df.head()
-  
 
-    #x1 = x1.add_prefix('c')
-    #print(x1)
-    #print(x1)
-    #print(x1.query('W > 0.299249'))
-    #print(x1.query('W == 0.199249').values[:,1:])
-    #x1['c0'].value_counts()
-    #autoEncoder(x1)
+    # Regresion
+    linearRegressionModel(x1)
 
 
