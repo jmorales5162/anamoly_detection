@@ -1,7 +1,19 @@
+"""
+Regression Techniques
+=====================
+
+En esta aplicacion se implementaran tecnicas de regresion como son :
+
+- Modelos Autoncoder
+- Isolation Forest
+- Kmeans
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.ensemble import IsolationForest
 import os
+
 
 print(os.listdir(os.path.dirname(os.path.abspath(__file__))))
 
