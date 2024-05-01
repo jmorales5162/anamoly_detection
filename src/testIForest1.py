@@ -231,22 +231,49 @@ def polynomialRegressionModel(data):
     #X_train, X_test, y_train, y_test = train_test_split(poly_features, y, test_size=0.3, random_state=42)
 
 
-def polynomialRegressionModel2(data):
-    X = data[['radiation']].to_numpy()
-    Y = data[['W']].to_numpy()
-    poly = PolynomialFeatures(degree=3, include_bias=False)
-    poly_features = poly.fit_transform(X)
+def polynomialRegressionModel2():
+    df = normalize_data(pd.read_csv(Config2.path))
+    Y = df[['W']]
+    X = df[['radiation', 'temperature']]
+
+    poly = PolynomialFeatures(degree=2, include_bias=False)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+
+    poly_features = poly.fit_transform(X_train)
+    
+    #X_train, X_test, Y_train, Y_test = train_test_split(poly_features, Y, test_size=0.3, random_state=42)
+    print("Shapes X: " + str(X_test.shape) + "Shapes Y: " + str(Y_test.shape))
 
     poly_reg_model = LinearRegression()
-    poly_reg_model.fit(poly_features, Y)
-    y_predicted = poly_reg_model.predict(poly_features)
-    plt.figure(figsize=(10, 6))
-    plt.title("Your first polynomial regression – congrats! :)", size=16)
-    plt.scatter(X,Y)
-    plt.plot(X, y_predicted, c="red")
-    plt.show()
-    #X_train, X_test, y_train, y_test = train_test_split(poly_features, y, test_size=0.3, random_state=42)
+    poly_reg_model.fit(X_train, Y_train)
+    Y_predicted = poly_reg_model.predict(X_test)
+    from sklearn.metrics import mean_squared_error
+    poly_reg_rmse = np.sqrt(mean_squared_error(Y_test, Y_predicted))
+    print("Resultados: " + str(poly_reg_rmse))
 
+
+
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(10, 5))
+    #print("Shapes X: " + str(X_test.to_numpy()[:,0:1].shape) + "Shapes Y: " + str(Y_predicted.shape))
+    #Sprint(X_test[4,:])
+    X_test_rad = X_test.to_numpy()[:,0:1]
+    X_test_temp = X_test.to_numpy()[:,1:2]
+
+    ax1.scatter(X_test_rad, Y_predicted, label="Prediccion", color='red')
+    ax1.set_xlabel('Radiacion'); ax1.set_ylabel('Prediccion Watts')
+
+    ax2.scatter(X_test_rad, Y_test, label="Real", color='orange')
+    ax2.set_xlabel('Radiacion'); ax2.set_ylabel('Produccion Watts Real')
+
+    ax3.scatter(X_test_temp, Y_predicted, label="Prediccion", color='blue')
+    ax3.set_xlabel('Temperatura'); ax3.set_ylabel('Prediccion Watts')
+    #ax3.set_title('Produccion Solar')
+
+    ax4.scatter(X_test_temp, Y_test, label="Prediccion", color='cyan')
+    ax4.set_xlabel('Temperatura'); ax4.set_ylabel('Produccion Watts Real')
+    #ax4.set_title('Produccion Solar')
+    plt.tight_layout()
+    plt.show()
 
 
 
@@ -290,7 +317,7 @@ if __name__ == "__main__":
 
 
     # Estudio do conxunto de datos
-    graficarRelacionVariables()
+    #graficarRelacionVariables()
 
 
 
@@ -309,6 +336,7 @@ if __name__ == "__main__":
     x2 = load_data2(Config2.path)
 
     #linearRegressionModel(x1)
-    #polynomialRegressionModel(x2)
+    #polynomialRegressionModel2()
+    #gradientBoosting()
 
 
