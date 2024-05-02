@@ -1,8 +1,27 @@
 import pandas as pd
 import Config
+from sklearn.pipeline import make_pipeline
+from pathlib import Path
+from cross_validation import cross_validation_regression
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
 
 
+def randomForest(datafile, depVars, indepVars):
+    df = pd.read_csv(datafile)
 
+    X = df[indepVars]; Y = df[depVars]
+    model = make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))
+    cross_validation_regression(model, X, y, folds=10, name="Solar production", model_name="RdmForest")
+    model.fit(X, Y)
+
+    predictions_vs_actuals(model, MODEL_NAME, name, X, y)
+
+    #plot_residuals_vs_fitted(model, MODEL_NAME, name)
+
+    output_path = Path("models/random_forest/", "random_forest_model.pkl")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, output_path)
 
 
 
@@ -24,5 +43,5 @@ if __name__ == "__main__":
 
     #linearRegressionModel(x1)
     #polynomialRegressionModel2()
-    gradientBoosting(Config2.path, "W", ["radiation", "temperature"])
-    randomForest(Config2.path, "W", ["radiation", "temperature"])
+    #gradientBoosting(Config.path, Config.depVars, Config.indepVars)
+    randomForest(Config.path, Config.depVars, Config.indepVars)
