@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from sklearn.ensemble import IsolationForest
+from sklearn.ensemble import IsolationForest, RandomForestRegressor
 import pandas as pd
 import os
 import Config2
@@ -9,6 +9,11 @@ from pathlib import Path
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+import joblib
 
 
 # AutoEncoder
@@ -214,22 +219,6 @@ def linearRegressionModel(data):
     plt.show()
 
 
-def polynomialRegressionModel(data):
-    X = data[['radiation']].to_numpy()
-    Y = data[['W']].to_numpy()
-    poly = PolynomialFeatures(degree=3, include_bias=False)
-    poly_features = poly.fit_transform(X)
-
-    poly_reg_model = LinearRegression()
-    poly_reg_model.fit(poly_features, Y)
-    y_predicted = poly_reg_model.predict(poly_features)
-    plt.figure(figsize=(10, 6))
-    plt.title("Your first polynomial regression – congrats! :)", size=16)
-    plt.scatter(X,Y)
-    plt.plot(X, y_predicted, c="red")
-    plt.show()
-    #X_train, X_test, y_train, y_test = train_test_split(poly_features, y, test_size=0.3, random_state=42)
-
 
 def polynomialRegressionModel2():
     df = normalize_data(pd.read_csv(Config2.path))
@@ -247,7 +236,6 @@ def polynomialRegressionModel2():
     poly_reg_model = LinearRegression()
     poly_reg_model.fit(X_train, Y_train)
     Y_predicted = poly_reg_model.predict(X_test)
-    from sklearn.metrics import mean_squared_error
     poly_reg_rmse = np.sqrt(mean_squared_error(Y_test, Y_predicted))
     print("Resultados: " + str(poly_reg_rmse))
 
@@ -296,11 +284,123 @@ def graficarRelacionVariables():
     plt.show()
 
 
-def gradientBoosting(data):
-    pass
+def gradientBoosting():
+    df = normalize_data(pd.read_csv(Config2.path))
+    Y = df[['W']]
+    X = df[['radiation', 'temperature']]
+    print(X.head())
+    print(Y.head())
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+    gbc=GradientBoostingRegressor(n_estimators=500,learning_rate=0.05,random_state=100,max_features=5 )
+    gbc.fit(X_train, Y_train)
+    Y_predicted = gbc.predict(X_test)
+    poly_reg_rmse = np.sqrt(mean_squared_error(Y_test, Y_predicted))
+    graficar_prediccions(X_test, Y_predicted, Y_test)
 
-def randomForest(data):
-    pass
+
+def graficar_prediccions(X_test, Y_predicted, Y_test):
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(10, 5))
+
+    X_test_rad = X_test.to_numpy()[:,0:1]
+    X_test_temp = X_test.to_numpy()[:,1:2]
+
+    ax1.scatter(X_test_rad, Y_predicted, label="Prediccion", color='red')
+    ax1.set_xlabel('Radiacion'); ax1.set_ylabel('Prediccion Watts')
+
+    ax2.scatter(X_test_rad, Y_test, label="Real", color='orange')
+    ax2.set_xlabel('Radiacion'); ax2.set_ylabel('Produccion Watts Real')
+
+    ax3.scatter(X_test_temp, Y_predicted, label="Prediccion", color='blue')
+    ax3.set_xlabel('Temperatura'); ax3.set_ylabel('Prediccion Watts')
+
+    ax4.scatter(X_test_temp, Y_test, label="Prediccion", color='cyan')
+    ax4.set_xlabel('Temperatura'); ax4.set_ylabel('Produccion Watts Real')
+
+    plt.tight_layout()
+    plt.show()
+
+
+def perform_regression_cv(model, X, y, folds=5, name="", model_name=""):
+    from sklearn.metrics import (
+        make_scorer,
+        mean_squared_error,
+        mean_absolute_error,
+        mean_absolute_percentage_error,
+    )
+    def smape(y_true, y_pred):
+        return 100 * np.mean(
+            2 * np.abs(y_pred - y_true) / (np.abs(y_pred) + np.abs(y_true))
+    )
+    def write_cv_results_to_file(cv_results, model_name, name):
+        output_path = Path(f"graphs/models/{model_name}/{name}/cv_results.txt")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            for metric_name, metric_values in cv_results.items():
+                if metric_name.startswith('test_'):
+                    # Formatear el nombre de la métrica para mejorar la legibilidad
+                    formatted_name = metric_name[5:].replace('_', ' ').capitalize()
+                    # Calcular promedio y desviación estándar
+                    mean_value = np.mean(metric_values)
+                    std_dev = np.std(metric_values)
+                    # Ajustar el formato del mensaje según el tipo de métrica
+                    if "mape" in metric_name.lower() or "smape" in metric_name.lower():
+                        f.write(f"{formatted_name}: {mean_value:.2f}% (+-{std_dev:.2f}%)\n")
+                    else:
+                        f.write(f"{formatted_name}: {mean_value:.4f} (+-{std_dev:.4f})\n")
+
+    smape_scorer = make_scorer(smape, greater_is_better=False)  # Make smape compatible
+
+    scoring = {
+        "MSE": make_scorer(mean_squared_error, greater_is_better=False),
+        "RMSE": make_scorer(
+            lambda y_true, y_pred: np.sqrt(mean_squared_error(y_true, y_pred)),
+            greater_is_better=False,
+        ),
+        "MAE": make_scorer(mean_absolute_error, greater_is_better=False),
+        "MAPE": make_scorer(mean_absolute_percentage_error, greater_is_better=False),
+        "SMAPE": smape_scorer,
+        "R2": "r2",
+    }
+    from sklearn.model_selection import cross_validate
+    cv_results = cross_validate(model, X, y, cv=folds, scoring=scoring)
+
+    write_cv_results_to_file(cv_results, model_name, name)
+
+
+def predictions_vs_actuals(model, model_name, name, X, y):
+    # Predictions vs Actuals
+    predictions = model.predict(X)
+    plt.scatter(y, predictions)
+    plt.xlabel("Actual values")
+    plt.ylabel("Predictions")
+    plt.title(f"Predictions vs. Actuals for {name}")
+    output_path = Path(f"graphs/models/{model_name}/{name}/predictions_vs_actuals.png")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path)
+    plt.close()
+
+def randomForest(datafile, dep_vars, indep_vars):
+    df = pd.read_csv(datafile)
+
+    X = df[indep_vars]  # Independent variables
+    y = df[dep_vars]  # Dependent variable
+
+    # Perform the linear regression
+    model = make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))
+
+    name = "RdmForest"
+    MODEL_NAME = "RdmForest"
+    perform_regression_cv(model, X, y, folds=10, name=name, model_name=MODEL_NAME)
+
+    model.fit(X, y)
+
+    predictions_vs_actuals(model, MODEL_NAME, name, X, y)
+
+    #plot_residuals_vs_fitted(model, MODEL_NAME, name)
+
+    output_path = Path("models/random_forest/", 'random_forest_model.pkl')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, output_path)
 
 
 
@@ -315,10 +415,8 @@ if __name__ == "__main__":
 
     x1 = load_data(Config2.path)
 
-
     # Estudio do conxunto de datos
     #graficarRelacionVariables()
-
 
 
     # Tecnicas de deteccion de anomalias
@@ -329,14 +427,9 @@ if __name__ == "__main__":
     
 
 
-
-
     # Regresion
-
-    x2 = load_data2(Config2.path)
 
     #linearRegressionModel(x1)
     #polynomialRegressionModel2()
-    #gradientBoosting()
-
-
+    gradientBoosting(Config2.path, "W", ["radiation", "temperature"])
+    randomForest(Config2.path, "W", ["radiation", "temperature"])
