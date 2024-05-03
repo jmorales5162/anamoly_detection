@@ -1,30 +1,12 @@
 import pandas as pd
 import Config
-from sklearn.pipeline import make_pipeline
 from pathlib import Path
-from cross_validation import cross_validation_regression
+import joblib
 from graficar import graficarResultados
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
-
-
-"""
-def predictions_vs_actuals(model, model_name, name, X, y):
-    # Predictions vs Actuals
-    predictions = model.predict(X)
-    plt.scatter(y, predictions)
-    plt.xlabel("Actual values")
-    plt.ylabel("Predictions")
-    plt.title(f"Predictions vs. Actuals for {name}")
-    output_path = Path(f"graphs/models/{model_name}/{name}/predictions_vs_actuals.png")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path)
-    plt.close()
-"""
-
-
-
-
+from sklearn.pipeline import make_pipeline
+from cross_validation import cross_validation_regression
 
 
 def randomForest(datafile, depVars, indepVars):
@@ -36,9 +18,6 @@ def randomForest(datafile, depVars, indepVars):
     model.fit(X, Y)
 
     graficarResultados(model, "RdmForest", X, Y)
-    #predictions_vs_actuals(model, MODEL_NAME, name, X, y)
-
-    #plot_residuals_vs_fitted(model, MODEL_NAME, name)
 
     output_path = Path("models/random_forest/", "random_forest_model.pkl")
     output_path.parent.mkdir(parents=True, exist_ok=True)

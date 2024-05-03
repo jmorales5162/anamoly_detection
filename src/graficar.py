@@ -25,7 +25,7 @@ def graficarResultados(modelo, nombre, X, Y):
     ax4.set_xlabel('Temperatura'); ax4.set_ylabel('Produccion Watts Real')
 
     plt.tight_layout()
-    output_path = Path(f"graphs/models/{model_name}/{name}/graficaResultados.png")
+    output_path = Path(f"graphs/models/{nombre}/graficaResultados.png")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path)
     plt.close()
