@@ -1,4 +1,5 @@
-from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error,
+from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
+import numpy as np
     
 def cross_validation_regression(model, X, y, folds=5, name="", model_name=""):
     
