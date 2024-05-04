@@ -69,8 +69,8 @@ def isolationForest(path):
     pca_df['iso_forest_outliers'] = pca_df['iso_forest_outliers'].replace([-1, 1], ["Yes", "No"])# Print the first 5 firms
     pca_df.head()
 
-    import plotly.io as pio# Plot [1] All firms
-    plot_firms(pca_df, "Figure 1: All Firms").show("png")
+    #import plotly.io as pio# Plot [1] All firms
+    #plot_firms(pca_df, "Figure 1: All Firms").show("png")
 
     
 
@@ -202,17 +202,20 @@ if __name__ == "__main__":
 
     # 2: Tecnicas de deteccion de anomalias
 
-    isolationForest(Config.path)
+    #isolationForest(Config.path)
     #kmeans(Config.path, Config.n_clusters)
     #autoEncoder(Config.path)
     
 
     # 3: Modelos de regresion
 
+
+
+
     methods = []
     methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
 
-    methods.append(("polynomialMethod", make_pipeline(
+    """    methods.append(("polynomialMethod", make_pipeline(
         PolynomialFeatures(2, include_bias=False),
         StandardScaler(),
         LinearRegression(),
@@ -224,7 +227,12 @@ if __name__ == "__main__":
     )))
 
     methods.append(("rdmForestMethod", make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))))
-
+    """
     
-    #for method in methods:
-    #    adestrarMetodo(Config.path, method[1], method[0], Config.depVars, Config.indepVars)
+
+
+    for method in methods:
+
+        adestrarMetodo(Config.path, method[1], method[0], Config.depVars, Config.indepVars)
+       
+

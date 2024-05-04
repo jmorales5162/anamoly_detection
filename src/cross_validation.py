@@ -1,7 +1,8 @@
 from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 import numpy as np
 from pathlib import Path
-    
+from sklearn.model_selection import cross_validate
+ 
 def cross_validation_regression(model, X, y, folds=5, name="", model_name=""):
     
     def smape(y_true, y_pred):
@@ -37,7 +38,5 @@ def cross_validation_regression(model, X, y, folds=5, name="", model_name=""):
         "SMAPE": smape_scorer,
         "R2": "r2",
     }
-    from sklearn.model_selection import cross_validate
     cv_results = cross_validate(model, X, y, cv=folds, scoring=scoring)
-
     write_cv_results_to_file(cv_results, model_name, name)
