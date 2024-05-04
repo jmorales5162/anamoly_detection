@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import Config
 from pathlib import Path
 import joblib
@@ -10,16 +11,24 @@ from sklearn.ensemble import IsolationForest, RandomForestRegressor, GradientBoo
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from cross_validation import cross_validation_regression
+from sklearn.cluster import KMeans
+
+# AutoEncoder
+import tensorflow as tf
+from tensorflow.keras import models, layers
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from autoencoder import AutoEncoder
 
 # Ano-malias
-def normalize_data(df):
-    new_min = 0; new_max = 1
-    normalized_df = (df - df.min()) / (df.max() - df.min())
-    return normalized_df
 
 
+# Funciona con duas variables pero con 3?
 def isolationForest(path):
-    data = pd.read_csv(path).to_numpy()
+    data = pd.read_csv(path)
+    data = data[['W', 'radiation']].to_numpy()
+    
+    print(data.shape)
     resultados = np.zeros((3, data.shape[0])) # (3,52547)
     c = [0.01, 0.05, 0.1] 
     for i in range(len(c)):
@@ -48,9 +57,11 @@ def isolationForest(path):
     
 
 
-def kmeans(path):
+def kmeans(path, n_clusters):
     data = pd.read_csv(path)
-    n_clusters = 3
+    data = data[['W', 'radiation']].to_numpy()
+
+    #n_clusters = 3
     n_clusters_to_detect = n_clusters # Number of clusters (including anomalies)
     kmeans = KMeans(n_clusters=n_clusters_to_detect)
     kmeans.fit(data)
@@ -77,8 +88,51 @@ def kmeans(path):
 
 
 
-def autoEncoder(data):
-    x_train, x_test, y_train, y_test = train_test_split(data.values, data.values[:,0:1], test_size=0.2, random_state=111)
+def autoEncoder(path):
+    data = pd.read_csv(path)
+    data = data[['W', 'radiation']].to_numpy()
+    x_train, x_test, y_train, y_test = train_test_split(data, data[:,0:1], test_size=0.2, random_state=111)
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(x_train)
+    X_test_scaled = scaler.fit_transform(x_test)
+    autoencoder = models.Sequential()
+    autoencoder.add(layers.Dense(1, input_shape=X_train_scaled.shape[1:], activation='relu'))
+    autoencoder.add(layers.Dense(2))
+    autoencoder.compile(optimizer='adam', loss='mse')
+    autoencoder.summary()
+    history = autoencoder.fit(X_train_scaled, X_train_scaled, 
+          epochs=30, 
+          batch_size=100,
+          validation_data=(X_test_scaled, X_test_scaled),
+          shuffle=True)
+    
+    mse_train = tf.keras.losses.mse(autoencoder.predict(X_train_scaled), X_train_scaled)
+    umbral = np.max(mse_train)
+
+    plt.figure(figsize=(12,4))
+    plt.hist(mse_train, bins=50)
+    plt.xlabel("Error de reconstrucción (entrenamiento)")
+    plt.ylabel("Número de datos")
+    plt.axvline(umbral, color='r', linestyle='--')
+    plt.legend(["Umbral"], loc="upper center")
+    plt.show()
+    e_test = autoencoder.predict(X_test_scaled)
+
+    mse_test = np.mean(np.power(X_test_scaled - e_test, 2), axis=1)
+    plt.figure(figsize=(12,4))
+    plt.plot(range(1,X_train_scaled.shape[0]+1),mse_train,'b.')
+    plt.plot(range(X_train_scaled.shape[0]+1,X_train_scaled.shape[0]+X_test_scaled.shape[0]+1),mse_test,'r.')
+    plt.axhline(umbral, color='r', linestyle='--')
+    plt.xlabel('Índice del dato')
+    plt.ylabel('Error de reconstrucción');
+    plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
+    plt.show()
+
+"""
+def autoEncoder(path):
+    data = pd.read_csv(path)
+    data = data[['W', 'radiation']].to_numpy()
+    x_train, x_test, y_train, y_test = train_test_split(data, data[:,0:1], test_size=0.2, random_state=111)
     model = AutoEncoder()
 
     early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=2, mode="min")
@@ -119,7 +173,7 @@ def autoEncoder(data):
     plt.legend(loc='upper right')
     plt.title("Normal and Anomaly Loss")
     plt.show()
-
+"""
 
 
 def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
@@ -141,11 +195,10 @@ if __name__ == "__main__":
 
 
     # 2: Tecnicas de deteccion de anomalias
-    #df1 = pd.read_csv(path)
-    #normalize_data(df1[['W', 'radiation', 'temperature']])
+
     isolationForest(Config.path)
-    #kmeans(x1.to_numpy())
-    #autoEncoder2(x1.to_numpy())
+    kmeans(Config.path, Config.n_clusters)
+    autoEncoder(Config.path)
     
 
     # 3: Modelos de regresion
