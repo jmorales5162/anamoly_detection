@@ -422,8 +422,8 @@ if __name__ == "__main__":
     # Tecnicas de deteccion de anomalias
     print(x1.shape)
     isolationForest(x1.to_numpy())
-    #kmeans(x1.to_numpy())
-    #autoEncoder2(x1.to_numpy())
+    kmeans(x1.to_numpy())
+    autoEncoder2(x1.to_numpy())
     
 
 

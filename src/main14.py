@@ -13,6 +13,8 @@ from sklearn.pipeline import make_pipeline
 from cross_validation import cross_validation_regression
 from sklearn.cluster import KMeans
 
+from sklearn.decomposition import PCA
+
 # AutoEncoder
 import tensorflow as tf
 from tensorflow.keras import models, layers
@@ -22,11 +24,61 @@ from autoencoder import AutoEncoder
 
 # Ano-malias
 
-
+def plot_firms (dataframe, title, color = None):
+    """ Plot firms on the 2-dimensional space """
+    
+    # Generate a scatter plot
+    fig = px.scatter(pca_df, x="principal_component_1", y="principal_component_2", title=title, color=color)
+    
+    # Layout
+    fig.update_layout(
+        font_family='Arial Black',
+        title=dict(font=dict(size=20, color='red')),
+        yaxis=dict(tickfont=dict(size=13, color='black'),
+                   titlefont=dict(size=15, color='black')),
+        xaxis=dict(tickfont=dict(size=13, color='black'),
+                   titlefont=dict(size=15, color='black')),
+        legend=dict(font=dict(size=10, color='black')),
+        plot_bgcolor='white'
+    )
+      
+    return(fig)# Need to import renderers to view the plots on GitHub
 # Funciona con duas variables pero con 3?
 def isolationForest(path):
     data = pd.read_csv(path)
-    data = data[['W', 'radiation']].to_numpy()
+    data = data[['radiation', 'temperature']].to_numpy()
+
+    # Standardize features
+    sample_scaled = StandardScaler().fit_transform(data)# Define dimensions = 2
+    pca = PCA(n_components=2)# Conduct the PCA
+    principal_comp = pca.fit_transform(sample_scaled)# Convert to dataframe
+    pca_df = pd.DataFrame(data = principal_comp, columns = ['principal_component_1', 'principal_component_2'])
+    pca_df.head()
+
+    # Train the model
+    isf = IsolationForest(contamination=0.04)
+    isf.fit(pca_df)# Predictions
+    predictions = isf.predict(pca_df)
+
+    # Extract scores
+    pca_df["iso_forest_scores"] = isf.decision_function(pca_df)# Extract predictions
+    pca_df["iso_forest_outliers"] = predictions# Describe the dataframe
+    pca_df.describe()
+
+    # Replace "-1" with "Yes" and "1" with "No"
+    pca_df['iso_forest_outliers'] = pca_df['iso_forest_outliers'].replace([-1, 1], ["Yes", "No"])# Print the first 5 firms
+    pca_df.head()
+
+    import plotly.io as pio# Plot [1] All firms
+    plot_firms(pca_df, "Figure 1: All Firms").show("png")
+
+    
+
+
+""""
+def isolationForest(path):
+    data = pd.read_csv(path)
+    data = data[['W', 'radiation', 'temperature']].to_numpy()
     
     print(data.shape)
     resultados = np.zeros((3, data.shape[0])) # (3,52547)
@@ -54,7 +106,7 @@ def isolationForest(path):
         ax.set_ylabel("Radiacion", size=8)
         ax.set_xlabel("Watts", size=8)
     plt.show()
-    
+ """   
 
 
 def kmeans(path, n_clusters):
@@ -128,52 +180,6 @@ def autoEncoder(path):
     plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
     plt.show()
 
-"""
-def autoEncoder(path):
-    data = pd.read_csv(path)
-    data = data[['W', 'radiation']].to_numpy()
-    x_train, x_test, y_train, y_test = train_test_split(data, data[:,0:1], test_size=0.2, random_state=111)
-    model = AutoEncoder()
-
-    early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=2, mode="min")
-    model.compile(optimizer='adam', loss="mae")
-    history = model.fit(normal_train_data, normal_train_data, epochs=50, batch_size=120,
-                    validation_data=(train_data_scaled[:,1:], train_data_scaled[:, 1:]),
-                    shuffle=True,
-                    callbacks=[early_stopping]
-                    )
-    encoder_out = model.encoder(normal_test_data).numpy() #8 unit representation of data
-    decoder_out = model.decoder(encoder_out).numpy()
-    plt.plot(normal_test_data[0], 'b')
-    plt.plot(decoder_out[0], 'r')
-    plt.title("Model performance on Normal data")
-    plt.show()
-
-    encoder_out_a = model.encoder(anomaly_test_data).numpy() #8 unit representation of data
-    decoder_out_a = model.decoder(encoder_out_a).numpy()
-    plt.plot(anomaly_test_data[0], 'b')
-    plt.plot(decoder_out_a[0], 'r')
-    plt.title("Model performance on Anomaly Data")
-    plt.show()
-
-    reconstruction = model.predict(normal_test_data)
-    train_loss = tf.keras.losses.mae(reconstruction, normal_test_data)
-    plt.hist(train_loss, bins=50)
-
-    threshold = np.mean(train_loss) + 2*np.std(train_loss)
-    reconstruction_a = model.predict(anomaly_test_data)
-    train_loss_a = tf.keras.losses.mae(reconstruction_a, anomaly_test_data)
-    plt.hist(train_loss_a, bins=50)
-    plt.title("loss on anomaly test data")
-    plt.show()
-
-    plt.hist(train_loss, bins=50, label='normal')
-    plt.hist(train_loss_a, bins=50, label='anomaly')
-    plt.axvline(threshold, color='r', linewidth=3, linestyle='dashed', label='{:0.3f}'.format(threshold))
-    plt.legend(loc='upper right')
-    plt.title("Normal and Anomaly Loss")
-    plt.show()
-"""
 
 
 def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
@@ -197,8 +203,8 @@ if __name__ == "__main__":
     # 2: Tecnicas de deteccion de anomalias
 
     isolationForest(Config.path)
-    kmeans(Config.path, Config.n_clusters)
-    autoEncoder(Config.path)
+    #kmeans(Config.path, Config.n_clusters)
+    #autoEncoder(Config.path)
     
 
     # 3: Modelos de regresion
