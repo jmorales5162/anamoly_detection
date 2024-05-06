@@ -22,6 +22,9 @@ from tensorflow.keras import models, layers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from autoencoder import AutoEncoder
+import seaborn as sns
+
+import datetime
 
 # Ano-malias
 
@@ -149,8 +152,68 @@ def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
     joblib.dump(model, output_path)
 
 
-def graficarRelacionVariables(path):
-    df = pd.read_csv(path)
+
+
+
+def abnormalities(data= None, row = None, col = None, title='DC Power'):
+    cols = data.columns # take all column
+    gp = plt.figure(figsize=(20,40)) 
+    
+    gp.subplots_adjust(wspace=0.2, hspace=0.5)
+    for i in range(1, len(cols)+1):
+        ax = gp.add_subplot(row,col, i)
+        data[cols[i-1]].plot(ax=ax, color='red')
+        ax.set_title('{} {}'.format(title, cols[i-1]),color='blue')
+    plt.show()
+        
+
+def graficarRelacionVariables():
+    weather_data = pd.read_csv(Config.weather_path)
+    generation_data = pd.read_csv(Config.generation_path)
+
+    generation_data['DATE_TIME'] = pd.to_datetime(generation_data['DATE_TIME'],format = '%d-%m-%Y %H:%M')
+    weather_data['DATE_TIME'] = pd.to_datetime(weather_data['DATE_TIME'],format = '%Y-%m-%d %H:%M:%S')
+    #print(generation_data.head())
+    df_solar = pd.merge(generation_data.drop(columns = ['PLANT_ID']), weather_data.drop(columns = ['PLANT_ID', 'SOURCE_KEY']), on='DATE_TIME')
+    # adding separate time and date columns
+    df_solar["DATE"] = pd.to_datetime(df_solar["DATE_TIME"]).dt.date
+    df_solar["TIME"] = pd.to_datetime(df_solar["DATE_TIME"]).dt.time
+    df_solar['DAY'] = pd.to_datetime(df_solar['DATE_TIME']).dt.day
+    df_solar['MONTH'] = pd.to_datetime(df_solar['DATE_TIME']).dt.month
+    #df_solar['WEEK'] = pd.to_datetime(df_solar['DATE_TIME']).dt.week
+
+
+    # add hours and minutes for ml models
+    df_solar['HOURS'] = pd.to_datetime(df_solar['TIME'],format='%H:%M:%S').dt.hour
+    df_solar['MINUTES'] = pd.to_datetime(df_solar['TIME'],format='%H:%M:%S').dt.minute
+    df_solar['TOTAL MINUTES PASS'] = df_solar['MINUTES'] + df_solar['HOURS']*60
+
+
+    # add date as string column
+    df_solar["DATE_STRING"] = df_solar["DATE"].astype(str) # add column with date as string
+    df_solar["HOURS"] = df_solar["HOURS"].astype(str)
+    df_solar["TIME"] = df_solar["TIME"].astype(str)
+    #print(df_solar.head(200))
+    print(df_solar.info())
+    print(df_solar.isnull().sum())
+
+    from sklearn.preprocessing import LabelEncoder
+    encoder = LabelEncoder()
+    df_solar['SOURCE_KEY_NUMBER'] = encoder.fit_transform(df_solar['SOURCE_KEY'])
+    print(df_solar.head())
+    sns.displot(data=df_solar, x="AMBIENT_TEMPERATURE", kde=True, bins = 100, color = "red", facecolor = "#3F7F7F",height = 5, aspect = 3.5)
+    plt.show()
+
+    solar_dc = df_solar.pivot_table(values='DC_POWER', index='TIME', columns='DATE')
+    abnormalities(data=solar_dc, row=12, col=3)
+
+    daily_irradiation = df_solar.groupby('DATE')['IRRADIATION'].agg('sum')
+
+    daily_irradiation.sort_values(ascending=False).plot.bar(figsize=(17,5), legend=True,color='blue')
+    plt.title('IRRADIATION')
+    plt.show()
+
+    """
     print("Max: " + str(df[['radiation']].max()))
     X_radiation = df[['radiation']].to_numpy()
     X_temperature = df[['temperature']].to_numpy()
@@ -166,13 +229,14 @@ def graficarRelacionVariables(path):
     ax2.set_title('Produccion Solar')
     plt.tight_layout()
     plt.show()
+    """
 
 
 if __name__ == "__main__":
 
     # 1: Estudo do conxunto de datos
 
-    graficarRelacionVariables(Config.path)
+    graficarRelacionVariables()
 
 
     # 2: Tecnicas de deteccion de anomalias
