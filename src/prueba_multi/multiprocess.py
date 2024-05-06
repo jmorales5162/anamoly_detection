@@ -33,6 +33,7 @@ def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, output_path)
 
+"""
 def multi_process_regression():
     with ProcessingPool() as pool:
         # Añadir las funciones al pool para su ejecución asíncrona
@@ -46,7 +47,8 @@ def multi_process_regression():
         resultado2.get()
         resultado3.get()
         resultado4.get()
-
+"""
+        
 def single_process_regression():
     adestrarMetodo(Config.path, Config.mr['lr_pipe'], Config.mr['lr'], Config.depVars, Config.indepVars)
     adestrarMetodo(Config.path, Config.mr['poly_pipe'], Config.mr['poly'], Config.depVars, Config.indepVars)
@@ -56,8 +58,8 @@ def single_process_regression():
 if __name__ == "__main__":
 
     # Medir el tiempo de ejecución para cada método
-    time_single = timeit("single_process_regression()", globals=globals(), number=1)
-    print(f"Tiempo de ejecución secuencial: {time_single/60:.2f} min")
+    #time_single = timeit("single_process_regression()", globals=globals(), number=1)
+    #print(f"Tiempo de ejecución secuencial: {time_single/60:.2f} min")
 
     time_multi = timeit("multi_process_regression()", globals=globals(), number=1)
     print(f"Tiempo de ejecución con multiprocesos: {time_multi/60:.2f} min")

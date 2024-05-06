@@ -149,18 +149,37 @@ def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
     joblib.dump(model, output_path)
 
 
+def graficarRelacionVariables(path):
+    df = pd.read_csv(path)
+    print("Max: " + str(df[['radiation']].max()))
+    X_radiation = df[['radiation']].to_numpy()
+    X_temperature = df[['temperature']].to_numpy()
+    Y_potencia = df[['W']].to_numpy()
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    ax1.scatter(X_radiation, Y_potencia.flatten(), label="Prediction", color='red')
+    ax1.set_xlabel('Radiacion'); ax1.set_ylabel('Produccion')
+    ax1.set_title('Produccion Solar')
+
+    ax2.scatter(X_temperature, Y_potencia.flatten(), label="Real", color='blue')
+    ax2.set_xlabel('Temperatura'); ax2.set_ylabel('Produccion')
+    ax2.set_title('Produccion Solar')
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
 
     # 1: Estudo do conxunto de datos
 
-    #graficarRelacionVariables()
+    graficarRelacionVariables(Config.path)
 
 
     # 2: Tecnicas de deteccion de anomalias
 
     #isolationForest(Config.path)
     #kmeans(Config.path, Config.n_clusters)
-    autoEncoder(Config.path)
+    #autoEncoder(Config.path)
     
 
     # 3: Modelos de regresion
@@ -171,7 +190,8 @@ if __name__ == "__main__":
     methods = []
     methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
 
-    """    methods.append(("polynomialMethod", make_pipeline(
+    """
+    methods.append(("polynomialMethod", make_pipeline(
         PolynomialFeatures(2, include_bias=False),
         StandardScaler(),
         LinearRegression(),
