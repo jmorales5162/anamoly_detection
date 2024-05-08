@@ -94,8 +94,6 @@ def kmeans(path, n_clusters):
     plt.show()
 
 
-
-
 def autoEncoder(path):
 
     data = pd.read_csv(path)
@@ -140,11 +138,10 @@ def autoEncoder(path):
     plt.show()
 
 
-
-def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
-    df = pd.read_csv(datafile); X = df[indepVars]; Y = df[depVars]
-    model = make_pipeline(StandardScaler(), metodo)
-    cross_validation_regression(model, X, Y, folds=10, name="Solar production", model_name=nome)
+def adestrarMetodo(df, model, nome, depVars, indepVars):
+    X = df[indepVars]; Y = df[depVars]
+    scaler = StandardScaler()
+    cross_validation_regression(model, scaler.fit_transform(X), scaler.fit_transform(Y), folds=10, name="Solar production", model_name=nome)
     model.fit(X, Y)
     graficarResultados(model, nome, X, Y)
     output_path = Path(f"models/{nome}/", f"{nome}.pkl")
@@ -152,91 +149,20 @@ def adestrarMetodo(datafile, metodo, nome, depVars, indepVars):
     joblib.dump(model, output_path)
 
 
-
-
-
-def abnormalities(data= None, row = None, col = None, title='DC Power'):
-    cols = data.columns # take all column
-    gp = plt.figure(figsize=(20,40)) 
-    
-    gp.subplots_adjust(wspace=0.2, hspace=0.5)
-    for i in range(1, len(cols)+1):
-        ax = gp.add_subplot(row,col, i)
-        data[cols[i-1]].plot(ax=ax, color='red')
-        ax.set_title('{} {}'.format(title, cols[i-1]),color='blue')
-    plt.show()
-        
-
-def graficarRelacionVariables():
+def process_df():
     weather_data = pd.read_csv(Config.weather_path)
     generation_data = pd.read_csv(Config.generation_path)
-
     generation_data['DATE_TIME'] = pd.to_datetime(generation_data['DATE_TIME'],format = '%d-%m-%Y %H:%M')
     weather_data['DATE_TIME'] = pd.to_datetime(weather_data['DATE_TIME'],format = '%Y-%m-%d %H:%M:%S')
-    #print(generation_data.head())
     df_solar = pd.merge(generation_data.drop(columns = ['PLANT_ID']), weather_data.drop(columns = ['PLANT_ID', 'SOURCE_KEY']), on='DATE_TIME')
-    # adding separate time and date columns
-    df_solar["DATE"] = pd.to_datetime(df_solar["DATE_TIME"]).dt.date
-    df_solar["TIME"] = pd.to_datetime(df_solar["DATE_TIME"]).dt.time
-    df_solar['DAY'] = pd.to_datetime(df_solar['DATE_TIME']).dt.day
-    df_solar['MONTH'] = pd.to_datetime(df_solar['DATE_TIME']).dt.month
-    #df_solar['WEEK'] = pd.to_datetime(df_solar['DATE_TIME']).dt.week
-
-
-    # add hours and minutes for ml models
-    df_solar['HOURS'] = pd.to_datetime(df_solar['TIME'],format='%H:%M:%S').dt.hour
-    df_solar['MINUTES'] = pd.to_datetime(df_solar['TIME'],format='%H:%M:%S').dt.minute
-    df_solar['TOTAL MINUTES PASS'] = df_solar['MINUTES'] + df_solar['HOURS']*60
-
-
-    # add date as string column
-    df_solar["DATE_STRING"] = df_solar["DATE"].astype(str) # add column with date as string
-    df_solar["HOURS"] = df_solar["HOURS"].astype(str)
-    df_solar["TIME"] = df_solar["TIME"].astype(str)
-    #print(df_solar.head(200))
-    print(df_solar.info())
-    print(df_solar.isnull().sum())
-
-    from sklearn.preprocessing import LabelEncoder
-    encoder = LabelEncoder()
-    df_solar['SOURCE_KEY_NUMBER'] = encoder.fit_transform(df_solar['SOURCE_KEY'])
-    print(df_solar.head())
-    sns.displot(data=df_solar, x="AMBIENT_TEMPERATURE", kde=True, bins = 100, color = "red", facecolor = "#3F7F7F",height = 5, aspect = 3.5)
-    plt.show()
-
-    solar_dc = df_solar.pivot_table(values='DC_POWER', index='TIME', columns='DATE')
-    abnormalities(data=solar_dc, row=12, col=3)
-
-    daily_irradiation = df_solar.groupby('DATE')['IRRADIATION'].agg('sum')
-
-    daily_irradiation.sort_values(ascending=False).plot.bar(figsize=(17,5), legend=True,color='blue')
-    plt.title('IRRADIATION')
-    plt.show()
-
-    """
-    print("Max: " + str(df[['radiation']].max()))
-    X_radiation = df[['radiation']].to_numpy()
-    X_temperature = df[['temperature']].to_numpy()
-    Y_potencia = df[['W']].to_numpy()
-
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-    ax1.scatter(X_radiation, Y_potencia.flatten(), label="Prediction", color='red')
-    ax1.set_xlabel('Radiacion'); ax1.set_ylabel('Produccion')
-    ax1.set_title('Produccion Solar')
-
-    ax2.scatter(X_temperature, Y_potencia.flatten(), label="Real", color='blue')
-    ax2.set_xlabel('Temperatura'); ax2.set_ylabel('Produccion')
-    ax2.set_title('Produccion Solar')
-    plt.tight_layout()
-    plt.show()
-    """
+    return df_solar.drop(columns = ['DATE_TIME', 'SOURCE_KEY', 'DAILY_YIELD', 'TOTAL_YIELD', 'AMBIENT_TEMPERATURE', 'AC_POWER'])
 
 
 if __name__ == "__main__":
 
     # 1: Estudo do conxunto de datos
 
-    graficarRelacionVariables()
+    #graficarRelacionVariables()
 
 
     # 2: Tecnicas de deteccion de anomalias
@@ -247,14 +173,13 @@ if __name__ == "__main__":
     
 
     # 3: Modelos de regresion
-
-
+    df = process_df()
 
 
     methods = []
     methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
 
-    """
+    
     methods.append(("polynomialMethod", make_pipeline(
         PolynomialFeatures(2, include_bias=False),
         StandardScaler(),
@@ -267,11 +192,7 @@ if __name__ == "__main__":
     )))
 
     methods.append(("rdmForestMethod", make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))))
-    """
-    
 
 
-    #for method in methods:
-    #    adestrarMetodo(Config.path, method[1], method[0], Config.depVars, Config.indepVars)
-       
-
+    for method in methods:
+        adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)

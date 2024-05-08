@@ -386,7 +386,8 @@ def randomForest(datafile, dep_vars, indep_vars):
     y = df[dep_vars]  # Dependent variable
 
     # Perform the linear regression
-    model = make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))
+    scaler = StandardScaler()
+    model = make_pipeline(scaler, RandomForestRegressor(n_estimators=100))
 
     name = "RdmForest"
     MODEL_NAME = "RdmForest"
