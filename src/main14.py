@@ -29,44 +29,43 @@ import datetime
 # Ano-malias
 
 def graficarAnomalias(data, outliers):
+    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
-    plt.scatter(data['radiation'], data['W'], c=outliers, cmap='viridis')
-    plt.scatter(data['radiation'][outliers == -1], data['W'][outliers == -1], 
+    plt.scatter(data['IRRADIATION'], data['DC_POWER'], c=outliers, cmap='viridis')
+    plt.scatter(data['IRRADIATION'][outliers == -1], data['DC_POWER'][outliers == -1], 
             edgecolors='r', facecolors='none', s=100, label='Outliers')
-    plt.xlabel('Radiation')
-    plt.ylabel('Watts')
-    plt.title('Radiation vs Watts')
+    plt.xlabel('IRRADIATION')
+    plt.ylabel('DC_POWER')
+    plt.title('IRRADIATION vs Watts')
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.scatter(data['temperature'], data['W'], c=outliers, cmap='viridis')
-    plt.scatter(data['temperature'][outliers == -1], data['W'][outliers == -1], 
+    plt.scatter(data['MODULE_TEMPERATURE'], data['DC_POWER'], c=outliers, cmap='viridis')
+    plt.scatter(data['MODULE_TEMPERATURE'][outliers == -1], data['DC_POWER'][outliers == -1], 
             edgecolors='r', facecolors='none', s=100, label='Outliers')
-    plt.xlabel('Temperature')
-    plt.ylabel('Watts')
-    plt.title('Temperature vs Watts')
+    plt.xlabel('MODULE_TEMPERATURE')
+    plt.ylabel('DC_POWER')
+    plt.title('MODULE_TEMPERATURE vs DC_POWER')
     plt.legend()
 
     plt.tight_layout()
     plt.show()
 
 
-def isolationForest(path):
-    data = pd.read_csv(path)
-    X = data[['radiation', 'temperature', 'W']]
+def isolationForest(df):
+    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     X_scaled = StandardScaler().fit_transform(X)
     model = IsolationForest(contamination=0.02)
     model.fit(X_scaled)
     outliers = model.predict(X_scaled)
-    graficarAnomalias(data, outliers)
+    graficarAnomalias(df, outliers)
 
     
 
-def kmeans(path, n_clusters):
-    data = pd.read_csv(path)
-    X = data[['radiation', 'temperature', 'W']]
+def kmeans(df, n_clusters):
+    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     X_scaled = StandardScaler().fit_transform(X)
     model = KMeans(n_clusters=n_clusters)
     model.fit(X_scaled)
@@ -85,11 +84,11 @@ def kmeans(path, n_clusters):
     plt.subplot(1, 2, 1)
     plt.scatter(X_scaled[:, 0], X_scaled[:, 2], marker='.', s=50, lw=0, alpha=0.7,c=colors, edgecolor='k')
     plt.scatter(anomalies[:, 0], anomalies[:, 2], color='red', marker='.', s=50, label='Anomalies')
-    plt.xlabel('Radiation'); plt.ylabel('Watts'); plt.title('Radiation vs Watts'); plt.legend()
+    plt.xlabel('IRRADIATION'); plt.ylabel('DC_POWER'); plt.title('IRRADIATION vs Watts'); plt.legend()
     plt.subplot(1, 2, 2)
     plt.scatter(X_scaled[:, 1], X_scaled[:, 2], marker='.', s=50, lw=0, alpha=0.7,c=colors, edgecolor='k')
     plt.scatter(anomalies[:, 1], anomalies[:, 2], color='red', marker='.', s=50, label='Anomalies')
-    plt.xlabel('Temperature'); plt.ylabel('Watts'); plt.title('Temperature vs Watts'); plt.legend()
+    plt.xlabel('MODULE_TEMPERATURE'); plt.ylabel('DC_POWER'); plt.title('MODULE_TEMPERATURE vs DC_POWER'); plt.legend()
     plt.tight_layout()
     plt.show()
 
@@ -163,17 +162,17 @@ if __name__ == "__main__":
     # 1: Estudo do conxunto de datos
 
     #graficarRelacionVariables()
-
+    df = process_df()
 
     # 2: Tecnicas de deteccion de anomalias
 
-    #isolationForest(Config.path)
-    #kmeans(Config.path, Config.n_clusters)
+    isolationForest(df)
+    kmeans(df, Config.n_clusters)
     #autoEncoder(Config.path)
     
 
     # 3: Modelos de regresion
-    df = process_df()
+    
 
 
     methods = []
@@ -194,5 +193,5 @@ if __name__ == "__main__":
     methods.append(("rdmForestMethod", make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))))
 
 
-    for method in methods:
-        adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
+    #for method in methods:
+    #    adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
