@@ -53,16 +53,13 @@ def graficarAnomalias(data, outliers):
     plt.tight_layout()
     plt.show()
 
-
 def isolationForest(df):
     X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     X_scaled = StandardScaler().fit_transform(X)
     model = IsolationForest(contamination=0.02)
     model.fit(X_scaled)
     outliers = model.predict(X_scaled)
-    graficarAnomalias(df, outliers)
-
-    
+    graficarAnomalias(df, outliers)    
 
 def kmeans(df, n_clusters):
     X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
@@ -93,11 +90,13 @@ def kmeans(df, n_clusters):
     plt.show()
 
 
-def autoEncoder(path):
+def autoEncoder(data):
 
-    data = pd.read_csv(path)
+    """    data = pd.read_csv(path)
     data = data[['W', 'radiation', 'temperature']]
-    x_train, x_test, y_train, y_test = train_test_split(data[['radiation', 'temperature']].to_numpy(), data[['W']].to_numpy(), test_size=0.2, random_state=111)
+    x_train, x_test, y_train, y_test = train_test_split(data[['radiation', 'temperature']].to_numpy(), data[['W']].to_numpy(), test_size=0.2, random_state=111)"""
+    data = data[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
+    x_train, x_test, y_train, y_test = train_test_split(data[['IRRADIATION', 'MODULE_TEMPERATURE']].to_numpy(), data[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(x_train)
     X_test_scaled = scaler.fit_transform(x_test)
@@ -163,12 +162,12 @@ if __name__ == "__main__":
 
     #graficarRelacionVariables()
     df = process_df()
-
+    print(df)
     # 2: Tecnicas de deteccion de anomalias
 
-    isolationForest(df)
-    kmeans(df, Config.n_clusters)
-    #autoEncoder(Config.path)
+    #isolationForest(df)
+    #kmeans(df, Config.n_clusters)
+    autoEncoder(df)
     
 
     # 3: Modelos de regresion
@@ -178,7 +177,7 @@ if __name__ == "__main__":
     methods = []
     methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
 
-    
+"""    
     methods.append(("polynomialMethod", make_pipeline(
         PolynomialFeatures(2, include_bias=False),
         StandardScaler(),
@@ -191,7 +190,7 @@ if __name__ == "__main__":
     )))
 
     methods.append(("rdmForestMethod", make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))))
-
+"""
 
     #for method in methods:
     #    adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
