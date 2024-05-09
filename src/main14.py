@@ -5,6 +5,7 @@ import matplotlib.cm as cm
 import Config
 from pathlib import Path
 import joblib
+import datetime
 from graficar import graficarResultados
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.ensemble import IsolationForest, RandomForestRegressor, GradientBoostingRegressor
@@ -21,10 +22,8 @@ import tensorflow as tf
 from tensorflow.keras import models, layers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from autoencoder import AutoEncoder
 import seaborn as sns
 
-import datetime
 
 # Ano-malias
 
@@ -54,16 +53,14 @@ def graficarAnomalias(data, outliers):
     plt.show()
 
 def isolationForest(df):
-    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
-    X_scaled = StandardScaler().fit_transform(X)
+    X_scaled = StandardScaler().fit_transform(df)
     model = IsolationForest(contamination=0.02)
     model.fit(X_scaled)
     outliers = model.predict(X_scaled)
     graficarAnomalias(df, outliers)    
 
 def kmeans(df, n_clusters):
-    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
-    X_scaled = StandardScaler().fit_transform(X)
+    X_scaled = StandardScaler().fit_transform(df)
     model = KMeans(n_clusters=n_clusters)
     model.fit(X_scaled)
     cluster_labels = model.predict(X_scaled)
@@ -91,11 +88,6 @@ def kmeans(df, n_clusters):
 
 
 def autoEncoder(data):
-
-    """    data = pd.read_csv(path)
-    data = data[['W', 'radiation', 'temperature']]
-    x_train, x_test, y_train, y_test = train_test_split(data[['radiation', 'temperature']].to_numpy(), data[['W']].to_numpy(), test_size=0.2, random_state=111)"""
-    data = data[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     x_train, x_test, y_train, y_test = train_test_split(data[['IRRADIATION', 'MODULE_TEMPERATURE']].to_numpy(), data[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(x_train)
@@ -131,7 +123,7 @@ def autoEncoder(data):
     plt.plot(range(X_train_scaled.shape[0]+1,X_train_scaled.shape[0]+X_test_scaled.shape[0]+1),mse_test,'r.')
     plt.axhline(umbral, color='r', linestyle='--')
     plt.xlabel('Índice del dato')
-    plt.ylabel('Error de reconstrucción');
+    plt.ylabel('Error de reconstrucción')
     plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
     plt.show()
 
