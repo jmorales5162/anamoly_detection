@@ -11,7 +11,7 @@ depVars = ['DC_POWER']
 indepVars = ['IRRADIATION', 'MODULE_TEMPERATURE']
 
 n_clusters = 3
-
+contamination=0.01
 
 mr = {  #models regression
 'lr'            : "linealRegression",
