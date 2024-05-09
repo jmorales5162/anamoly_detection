@@ -157,8 +157,8 @@ if __name__ == "__main__":
     print(df)
     # 2: Tecnicas de deteccion de anomalias
 
-    #isolationForest(df)
-    #kmeans(df, Config.n_clusters)
+    isolationForest(df)
+    kmeans(df, Config.n_clusters)
     autoEncoder(df)
     
 
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     methods = []
     methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
 
-"""    
+    
     methods.append(("polynomialMethod", make_pipeline(
         PolynomialFeatures(2, include_bias=False),
         StandardScaler(),
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     )))
 
     methods.append(("rdmForestMethod", make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))))
-"""
 
-    #for method in methods:
-    #    adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
+
+    for method in methods:
+        adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
