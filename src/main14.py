@@ -13,22 +13,20 @@ from sklearn.pipeline import make_pipeline
 from cross_validation import cross_validation_regression
 from sklearn.cluster import KMeans
 from sklearn.metrics import confusion_matrix
-
+from timeit import timeit
 from sklearn.decomposition import PCA
-
+from multiprocessing import Process
 # AutoEncoder
 import tensorflow as tf
 from tensorflow.keras import models, layers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import seaborn as sns
 
 import datetime
 
 # Ano-malias
 
 def graficarAnomalias(data, outliers):
-    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
@@ -53,16 +51,14 @@ def graficarAnomalias(data, outliers):
     plt.show()
 
 def isolationForest(df):
-    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
-    X_scaled = StandardScaler().fit_transform(X)
+    X_scaled = StandardScaler().fit_transform(df)
     model = IsolationForest(contamination=0.02)
     model.fit(X_scaled)
     outliers = model.predict(X_scaled)
     graficarAnomalias(df, outliers)    
 
 def kmeans(df, n_clusters):
-    X = df[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
-    X_scaled = StandardScaler().fit_transform(X)
+    X_scaled = StandardScaler().fit_transform(df)
     model = KMeans(n_clusters=n_clusters)
     model.fit(X_scaled)
     cluster_labels = model.predict(X_scaled)
@@ -90,11 +86,6 @@ def kmeans(df, n_clusters):
 
 
 def autoEncoder(data):
-
-    """    data = pd.read_csv(path)
-    data = data[['W', 'radiation', 'temperature']]
-    x_train, x_test, y_train, y_test = train_test_split(data[['radiation', 'temperature']].to_numpy(), data[['W']].to_numpy(), test_size=0.2, random_state=111)"""
-    data = data[['DC_POWER','IRRADIATION', 'MODULE_TEMPERATURE']]
     x_train, x_test, y_train, y_test = train_test_split(data[['IRRADIATION', 'MODULE_TEMPERATURE']].to_numpy(), data[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(x_train)
@@ -154,42 +145,49 @@ def process_df():
     df_solar = pd.merge(generation_data.drop(columns = ['PLANT_ID']), weather_data.drop(columns = ['PLANT_ID', 'SOURCE_KEY']), on='DATE_TIME')
     return df_solar.drop(columns = ['DATE_TIME', 'SOURCE_KEY', 'DAILY_YIELD', 'TOTAL_YIELD', 'AMBIENT_TEMPERATURE', 'AC_POWER'])
 
+def single_process_regression(df):
+    adestrarMetodo(df, Config.mr['lr_pipe'], Config.mr['lr'], Config.depVars, Config.indepVars)
+    adestrarMetodo(df, Config.mr['poly_pipe'], Config.mr['poly'], Config.depVars, Config.indepVars)
+    adestrarMetodo(df, Config.mr['gBoosting_pipe'], Config.mr['gBoosting'], Config.depVars, Config.indepVars)
+    adestrarMetodo(df, Config.mr['rf_pipe'], Config.mr['rf'], Config.depVars, Config.indepVars)
+
+def multi_process_regression_constructor(df):
+    p1 = Process(target=adestrarMetodo, args=(df, Config.mr['lr_pipe'], Config.mr['lr'], Config.depVars, Config.indepVars))
+    p2 = Process(target=adestrarMetodo, args=(df, Config.mr['poly_pipe'], Config.mr['poly'], Config.depVars, Config.indepVars))
+    p3 = Process(target=adestrarMetodo, args=(df, Config.mr['gBoosting_pipe'], Config.mr['gBoosting'], Config.depVars, Config.indepVars))
+    p4 = Process(target=adestrarMetodo, args=(df, Config.mr['rf_pipe'], Config.mr['rf'], Config.depVars, Config.indepVars))
+
+    procesos = [p1,p2,p3,p4]
+
+    for proceso in procesos:
+        proceso.start()
+        
+    for proceso in procesos:
+        proceso.join()
+
+
+
 
 if __name__ == "__main__":
 
     # 1: Estudo do conxunto de datos
-
-    #graficarRelacionVariables()
+    tiempos = {}
     df = process_df()
     print(df)
     # 2: Tecnicas de deteccion de anomalias
 
-    isolationForest(df)
-    kmeans(df, Config.n_clusters)
-    autoEncoder(df)
+    #tiempos['single_process'] = timeit("single_process_regression(df)", globals=globals(), number=1)
+    tiempos['process_with_constructor'] = timeit("multi_process_regression_constructor(df)", globals=globals(), number=1)
+
+    for metodo,tiempo in tiempos.items():
+        print(f"Tiempo de ejecución para {metodo}: {tiempo/60:.2f} min")
+
     
+    #isolationForest(df)
+    #kmeans(df, Config.n_clusters)
+    #autoEncoder(df)
+    
+
 
     # 3: Modelos de regresion
-    
 
-
-    methods = []
-    methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
-
-    
-    methods.append(("polynomialMethod", make_pipeline(
-        PolynomialFeatures(2, include_bias=False),
-        StandardScaler(),
-        LinearRegression(),
-    )))
-
-    methods.append(("gradientBoostingMethod", make_pipeline(
-        StandardScaler(), 
-        GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3)
-    )))
-
-    methods.append(("rdmForestMethod", make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))))
-
-
-    for method in methods:
-        adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
