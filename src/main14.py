@@ -13,8 +13,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from cross_validation import cross_validation_regression
 from sklearn.cluster import KMeans
-from sklearn.metrics import confusion_matrix
-
+from sklearn.metrics import confusion_matrix, f1_score
 from sklearn.decomposition import PCA
 
 # AutoEncoder
@@ -54,14 +53,35 @@ def graficarAnomalias(data, outliers):
 
 def isolationForest(df):
     X_scaled = StandardScaler().fit_transform(df)
-    model = IsolationForest(contamination=0.02)
+    model = IsolationForest(contamination=0.01) #contamination 1%
     model.fit(X_scaled)
     outliers = model.predict(X_scaled)
-    graficarAnomalias(df, outliers)    
+    graficarAnomalias(df, outliers)
+    # Nos inventamos un 1% de datos anomalos y vemos si los clasifica bien
+    # 68774 FILAS ten o dataframe total, 687 FILAS ten o dataframe anomalo
+    filasDf = df.shape[0]
+    num_anomalias = round(filasDf * 0.01)
+    f1_results = []
+    for i in range(10):
+        dfanomalo = pd.DataFrame({'DC_POWER':np.random.randint(0.0,28,size=num_anomalias),
+                    'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                    'IRRADIATION':np.random.randint(0.0,171,size=num_anomalias)})
+        
+        Y = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+        df_train = StandardScaler().fit_transform(pd.concat([df, dfanomalo], ignore_index=True))
+        model.fit(df_train); Y_pred = model.predict(df_train)
+        Y_pred[Y_pred == 1] = 0; Y_pred[Y_pred == -1] = 1
+        f1_results.append(f1_score(Y, Y_pred))
 
-def kmeans(df, n_clusters):
+    f1_results = np.array(f1_results)
+    mean = np.mean(f1_results); std = np.std(f1_results)
+    print("media F1: " + str(mean) + " std: " + str(std))
+
+
+
+def kmeans(df):
     X_scaled = StandardScaler().fit_transform(df)
-    model = KMeans(n_clusters=n_clusters)
+    model = KMeans(n_clusters=Config.n_clusters)
     model.fit(X_scaled)
     cluster_labels = model.predict(X_scaled)
     cluster_centers = model.cluster_centers_
@@ -72,6 +92,8 @@ def kmeans(df, n_clusters):
 
     anomalies = [X_scaled[i] for i, distance in enumerate(distances) if distance > threshold_distance]
     anomalies = np.asarray(anomalies, dtype=np.float32)
+
+
 
     colors = cm.nipy_spectral(cluster_labels.astype(float) / 3)
     plt.figure(figsize=(12, 5))
@@ -86,9 +108,40 @@ def kmeans(df, n_clusters):
     plt.tight_layout()
     plt.show()
 
+    #Y = np.array(np.where((distances > threshold_distance), 1, 0))
+    #anomalies2 = np.array(anomalies2)
+    
+    filasDf = df.shape[0]
+    #print(" Forma das anomalias " + str(anomalies2.shape) + " Primeros 10 elementos: " + str(anomalies2[-10:]))ape[0]
+    num_anomalias = round(filasDf * 0.01)
+    f1_results = []
+    for i in range(10):
+        dfanomalo = pd.DataFrame({'DC_POWER':np.random.randint(0.0,28,size=num_anomalias),
+                    'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                    'IRRADIATION':np.random.randint(0.0,171,size=num_anomalias)})
+        
+        Y = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+        df_train = StandardScaler().fit_transform(pd.concat([df, dfanomalo], ignore_index=True))
+        model.fit(df_train)
+        cluster_labels = model.predict(df_train)
+        cluster_centers = model.cluster_centers_
+        distances = [np.linalg.norm(x - cluster_centers[cluster]) for x, cluster in zip(df_train, cluster_labels)]
+        threshold_distance = np.percentile(distances, percentile_threshold)
+        #Y_pred = model.predict(df_train)
+        Y_pred = np.array(np.where((distances > threshold_distance), 1, 0))
+        #Y_pred[Y_pred == 1] = 0; Y_pred[Y_pred == -1] = 1
+        f1_results.append(f1_score(Y, Y_pred))
 
-def autoEncoder(data):
-    x_train, x_test, y_train, y_test = train_test_split(data[['IRRADIATION', 'MODULE_TEMPERATURE']].to_numpy(), data[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
+    #print(" Forma das anomalias " + str(Y[-10:]) + " Primeros 10 elementos: " + str(Y_pred[-10:]))
+    f1_results = np.array(f1_results)
+    print(f1_results)
+    mean = np.mean(f1_results); std = np.std(f1_results)
+    print("media F1: " + str(mean) + " std: " + str(std))
+
+
+
+def autoEncoder(df):
+    x_train, x_test, y_train, y_test = train_test_split(df[['IRRADIATION', 'MODULE_TEMPERATURE']].to_numpy(), df[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(x_train)
     X_test_scaled = scaler.fit_transform(x_test)
@@ -127,6 +180,26 @@ def autoEncoder(data):
     plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
     plt.show()
 
+    # COmo faso
+
+    filasDf = df.shape[0]
+    num_anomalias = round(filasDf * 0.01)
+    f1_results = []
+    for i in range(10):
+        dfanomalo = pd.DataFrame({'DC_POWER':np.random.randint(0.0,28,size=num_anomalias),
+                    'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                    'IRRADIATION':np.random.randint(0.0,171,size=num_anomalias)})
+        
+        Y = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+        df_train = StandardScaler().fit_transform(pd.concat([df, dfanomalo], ignore_index=True))
+        model.fit(df_train); Y_pred = model.predict(df_train)
+        Y_pred[Y_pred == 1] = 0; Y_pred[Y_pred == -1] = 1
+        f1_results.append(f1_score(Y, Y_pred))
+
+    f1_results = np.array(f1_results)
+    mean = np.mean(f1_results); std = np.std(f1_results)
+    print("media F1: " + str(mean) + " std: " + str(std))
+
 
 def adestrarMetodo(df, model, nome, depVars, indepVars):
     X = df[indepVars]; Y = df[depVars]
@@ -153,18 +226,19 @@ if __name__ == "__main__":
     # 1: Estudo do conxunto de datos
 
     #graficarRelacionVariables()
+
     df = process_df()
-    print(df)
+
     # 2: Tecnicas de deteccion de anomalias
 
-    isolationForest(df)
-    kmeans(df, Config.n_clusters)
+    #isolationForest(df)
+    #kmeans(df)
     autoEncoder(df)
     
 
     # 3: Modelos de regresion
     
-
+    """
 
     methods = []
     methods.append(("linealRegression", make_pipeline(StandardScaler(), LinearRegression())))
@@ -186,3 +260,4 @@ if __name__ == "__main__":
 
     for method in methods:
         adestrarMetodo(df, method[1], method[0], Config.depVars, Config.indepVars)
+    """
