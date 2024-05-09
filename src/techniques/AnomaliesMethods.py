@@ -1,3 +1,10 @@
+
+
+"""
+AnomaliesMethods
+================
+"""
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
@@ -9,10 +16,25 @@ import tensorflow as tf
 from tensorflow.keras import models, layers
 
 class AnomaliesMethod:
+    """Representa las técnicas de detección de anomalías empleadas.
+
+    :param df: Dataframe de datos a analizar
+    :type df: dataframe
+
+    """
     def __init__(self,df):
+        """Inicializa un objeto de la clase AnomaliesMethod."""
         self.df = df
 
     def isolationForest(self , contamination):
+        """
+        - Normaliza los datos de entrada
+        - Entrena y predice un modelo IsolationForest
+        - Grafica las anomalias encontradas en el conjunto de datos 
+
+        :param contamination: Grado de contaminación del modelo [0-1].
+        :type contamination: float
+        """
         X_scaled = StandardScaler().fit_transform(self.df)
         model = IsolationForest(contamination=contamination)
         model.fit(X_scaled)
@@ -20,6 +42,14 @@ class AnomaliesMethod:
         self.graficarAnomalias(self.df, outliers)    
 
     def graficarAnomalias(self,data,outliers):
+        """
+        - Grafica las anomalias encontradas en el conjunto de datos 
+
+        :param data: Datos a graficar.
+        :param outliers: Anomalías detectadas.
+        :type data: float 
+        :type outliers: float
+        """
         plt.figure(figsize=(12, 5))
 
         plt.subplot(1, 2, 1)
@@ -45,7 +75,12 @@ class AnomaliesMethod:
 
     def kmeans(self, n_clusters):
         """
-        n_clusters : Number of cluster
+        - Normaliza los datos de entrada
+        - Entrena y predice un modelo KMeans
+        - Grafica las anomalias encontradas en el conjunto de datos 
+
+        :param n_clusters: Cantidad de clusters en los que se desea dividir los datos.
+        :type n_clusters: int
         """
         X_scaled = StandardScaler().fit_transform(self.df)
         model = KMeans(n_clusters=n_clusters)
@@ -74,6 +109,12 @@ class AnomaliesMethod:
         plt.show()
 
     def autoEncoder(self):
+        """
+        - Normaliza los datos de entrada
+        - Entrena y predice una red autoncoder
+        - Grafica las anomalias encontradas en el conjunto de datos 
+
+        """
         x_train, x_test, y_train, y_test = train_test_split(self.df[['IRRADIATION', 'MODULE_TEMPERATURE']].to_numpy(), self.df[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(x_train)

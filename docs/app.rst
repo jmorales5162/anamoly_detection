@@ -1,8 +1,8 @@
 
-Alquiler
-========
+Main
+=====
 
-.. automodule:: test   
+.. automodule:: main   
     :members:
     :show-inheritance:
     

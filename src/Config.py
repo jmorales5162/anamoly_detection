@@ -24,4 +24,4 @@ mr = {  #models regression
 'rf_pipe'       : make_pipeline(StandardScaler(), RandomForestRegressor(n_estimators=100))
 }
 
-
+print(type(make_pipeline(StandardScaler(), LinearRegression())))

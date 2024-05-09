@@ -1,3 +1,8 @@
+"""
+RegressionMethods
+=================
+"""
+
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
 import numpy as np
@@ -8,12 +13,36 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 class RegressionMethod:
+    """Representa las métodos de regresión empleadas.
+
+    :param df: Dataframe de datos a analizar
+    :param indepVars: Variables independientes
+    :param depVars: Variables dependientes
+
+    :type df: dataframe
+    :type df: list
+    :type df: list
+
+    """
     def __init__(self , df , indepVars , depVars):
+        """Inicializa un objeto de la clase AnomaliesMethod."""
         self.df = df 
         self.indepVars = indepVars
         self.depVars = depVars
 
     def adestrarMetodo(self,model,nome):
+        """
+        - Normaliza los datos de entrada
+        - Realiza la validación cruzada de los datos
+        - Entrena el modelo
+        - Grafica los resultados  
+
+        :param model: Modelo a procesar
+        :param nome: Nombre del modelo a procesar
+ 
+        :type model: objeto Pipeline
+        :type nome: string
+        """
         X = self.df[self.indepVars]; Y = self.df[self.depVars]
         scaler = StandardScaler()
         self.cross_validation_regression(model, scaler.fit_transform(X), scaler.fit_transform(Y), folds=10, name="Solar production", model_name=nome)
@@ -24,7 +53,18 @@ class RegressionMethod:
         joblib.dump(model, output_path)
         
     def cross_validation_regression(self,model, X, y, folds=5, name="", model_name=""):
-        
+        """
+        - Realiza la validación cruzada
+        - Guarda metricas en un fichero .txt
+
+        :param model: Modelo a procesar
+        :param X: Datos de entrada
+        :param y: Datos de salida
+        :param model_name: Nombre del modelo
+
+        :type model: objeto Pipeline
+        :type model_name: string
+        """
         def smape(y_true, y_pred):
             return 100 * np.mean(2 * np.abs(y_pred - y_true) / (np.abs(y_pred) + np.abs(y_true)))
         
@@ -54,6 +94,17 @@ class RegressionMethod:
         write_cv_results_to_file(cv_results, model_name, name)
 
     def graficarResultados(self,modelo, nombre, X, Y):
+        """
+        - Grafica los resultados 
+
+        :param modelo: Modelo a procesar
+        :param nombre: Nombre del modelo
+        :param X: Datos de entrada
+        :param Y: Datos de salida
+
+        :type modelo: objeto Pipeline
+        :type nombre: string
+        """
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
         modelo.fit(X_train, Y_train)
         Y_predicted = modelo.predict(X_test)

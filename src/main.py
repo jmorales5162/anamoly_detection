@@ -7,6 +7,11 @@ from techniques.AnomaliesMethods import AnomaliesMethod
 from techniques.RegressionMethods import RegressionMethod
 
 def process_df():
+    """Preprocesamiento de los datos
+
+    - Se leen los datos del csv
+    - Se preprocesan los datos para su posterior análisis
+    """
     weather_data = pd.read_csv(Config.weather_path)
     generation_data = pd.read_csv(Config.generation_path)
     generation_data['DATE_TIME'] = pd.to_datetime(generation_data['DATE_TIME'],format = '%d-%m-%Y %H:%M')
@@ -15,23 +20,44 @@ def process_df():
     return df_solar.drop(columns = ['DATE_TIME', 'SOURCE_KEY', 'DAILY_YIELD', 'TOTAL_YIELD', 'AMBIENT_TEMPERATURE', 'AC_POWER'])
 
 def single_process_regression(rm):
+    """
+    - Se crean los procesos de regresion secuenciales de la clase Process
+
+    :param rm: Objeto de la clase RegressionMethod.
+    :type rm: object
+    """
     rm.adestrarMetodo(Config.mr['lr_pipe'],Config.mr['lr'])
     rm.adestrarMetodo(Config.mr['poly_pipe'],Config.mr['poly'])
     rm.adestrarMetodo(Config.mr['gBoosting_pipe'],Config.mr['gBoosting'])
     rm.adestrarMetodo(Config.mr['rf_pipe'],Config.mr['rf'])
 
 def single_process_anomalies(am):
+    """
+    - Se crean los procesos de detección de anomalías secuenciales de la clase Process
+
+    :param am: Objeto de la clase AnomaliesMethod.
+    :type am: object
+    """
     am.isolationForest(Config.contamination)
     am.kmeans(Config.n_clusters)
     am.autoEncoder()
 
 def multi_process_constructor(procesos):
+    """
+    - Ejecuta una lista de procesos
+
+    :param procesos: Lista de procesos a ejecutar
+    :type procesos: list
+    """
     for proceso in procesos:
         proceso.start()    
     for proceso in procesos:
         proceso.join()
 
 def create_process():
+    """
+    - Crea las listas de procesos para los modelos de regresión
+    """
     rm1 = Process(target= rm.adestrarMetodo, args=(Config.mr['lr_pipe'], Config.mr['lr']))
     rm2 = Process(target= rm.adestrarMetodo, args=(Config.mr['poly_pipe'], Config.mr['poly']))
     rm3 = Process(target= rm.adestrarMetodo, args=(Config.mr['gBoosting_pipe'], Config.mr['gBoosting']))
