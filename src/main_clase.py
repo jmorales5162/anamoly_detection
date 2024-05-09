@@ -31,6 +31,19 @@ def multi_process_constructor(procesos):
     for proceso in procesos:
         proceso.join()
 
+def create_process():
+    rm1 = Process(target= rm.adestrarMetodo, args=(Config.mr['lr_pipe'], Config.mr['lr']))
+    rm2 = Process(target= rm.adestrarMetodo, args=(Config.mr['poly_pipe'], Config.mr['poly']))
+    rm3 = Process(target= rm.adestrarMetodo, args=(Config.mr['gBoosting_pipe'], Config.mr['gBoosting']))
+    rm4 = Process(target= rm.adestrarMetodo, args=(Config.mr['rf_pipe'], Config.mr['rf']))
+    list1 = [rm1,rm2,rm3,rm4]
+
+    am1 = Process(target= am.isolationForest, args=(Config.contamination,))
+    am2 = Process(target= am.kmeans, args=(Config.n_clusters,))
+    am3 = Process(target= am.autoEncoder, args=())
+    list2 = [am1,am2,am3]
+    return list1, list2
+
 if __name__ == "__main__":
     
     tiempos = {}
@@ -38,25 +51,16 @@ if __name__ == "__main__":
     rm = RegressionMethod(df , Config.indepVars , Config.depVars)
     am = AnomaliesMethod(df)
     
+    regression_process_list , anomalies_process_list = create_process()
 
-    rm1 = Process(target= rm.adestrarMetodo, args=(Config.mr['lr_pipe'], Config.mr['lr']))
-    rm2 = Process(target= rm.adestrarMetodo, args=(Config.mr['poly_pipe'], Config.mr['poly']))
-    rm3 = Process(target= rm.adestrarMetodo, args=(Config.mr['gBoosting_pipe'], Config.mr['gBoosting']))
-    rm4 = Process(target= rm.adestrarMetodo, args=(Config.mr['rf_pipe'], Config.mr['rf']))
-
-    regression_process_list = [rm1,rm2,rm3,rm4]
-
-    am1 = Process(target= am.isolationForest, args=(Config.contamination,))
-    am2 = Process(target= am.kmeans, args=(Config.n_clusters,))
-    am3 = Process(target= am.autoEncoder, args=())
-
-    anomalies_process_list = [am1,am2,am3]
-
-    #tiempos['single_process_regression'] = timeit("single_process_regression(rm)", globals=globals(), number=1)
     tiempos['single_process_anomalies'] = timeit("single_process_anomalies(am)", globals=globals(), number=1)
-
-    #tiempos['regression_process_with_constructor'] = timeit("multi_process_constructor(regression_process_list)", globals=globals(), number=1)
     tiempos['anomalies_process_with_constructor'] = timeit("multi_process_constructor(anomalies_process_list)", globals=globals(), number=1)
+
+    tiempos['single_process_regression'] = timeit("single_process_regression(rm)", globals=globals(), number=1)
+    tiempos['regression_process_with_constructor'] = timeit("multi_process_constructor(regression_process_list)", globals=globals(), number=1)
+    
+    datos = pd.DataFrame(tiempos, index=[0])
+    datos.to_excel("./src/tiempos.xlsx", index=False)
 
     for metodo,tiempo in tiempos.items():
         print(f"Tiempo de ejecución para {metodo}: {tiempo/60:.2f} min")
