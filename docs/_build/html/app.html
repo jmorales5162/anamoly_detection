@@ -47,9 +47,11 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Main</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main.anomalies_process_with_pathos"><code class="docutils literal notranslate"><span class="pre">anomalies_process_with_pathos()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main.create_process"><code class="docutils literal notranslate"><span class="pre">create_process()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main.multi_process_constructor"><code class="docutils literal notranslate"><span class="pre">multi_process_constructor()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main.process_df"><code class="docutils literal notranslate"><span class="pre">process_df()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.regression_process_with_pathos"><code class="docutils literal notranslate"><span class="pre">regression_process_with_pathos()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main.single_process_anomalies"><code class="docutils literal notranslate"><span class="pre">single_process_anomalies()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main.single_process_regression"><code class="docutils literal notranslate"><span class="pre">single_process_regression()</span></code></a></li>
 </ul>
@@ -84,19 +86,26 @@
   <section id="module-main">
 <span id="main"></span><h1>Main<a class="headerlink" href="#module-main" title="Link to this heading"></a></h1>
 <dl class="py function">
+<dt class="sig sig-object py" id="main.anomalies_process_with_pathos">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">anomalies_process_with_pathos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#anomalies_process_with_pathos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.anomalies_process_with_pathos" title="Link to this definition"></a></dt>
+<dd><p>Ejecuta una lista de procesos de detección de anomalías</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>procesos</strong> (<em>list</em>) – Lista de procesos a ejecutar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="main.create_process">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">create_process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#create_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.create_process" title="Link to this definition"></a></dt>
-<dd><ul class="simple">
-<li><p>Crea las listas de procesos para los modelos de regresión</p></li>
-</ul>
+<dd><p>Crea las listas de procesos para los modelos de regresión y de detección de anomalías</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="main.multi_process_constructor">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">multi_process_constructor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">procesos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#multi_process_constructor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.multi_process_constructor" title="Link to this definition"></a></dt>
-<dd><ul class="simple">
-<li><p>Ejecuta una lista de procesos</p></li>
-</ul>
+<dd><p>Ejecuta una lista de procesos</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>procesos</strong> (<em>list</em>) – Lista de procesos a ejecutar</p>
@@ -115,11 +124,20 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="main.regression_process_with_pathos">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">regression_process_with_pathos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#regression_process_with_pathos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.regression_process_with_pathos" title="Link to this definition"></a></dt>
+<dd><p>Ejecuta una lista de procesos de regresion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>procesos</strong> (<em>list</em>) – Lista de procesos a ejecutar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="main.single_process_anomalies">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">single_process_anomalies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">am</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#single_process_anomalies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.single_process_anomalies" title="Link to this definition"></a></dt>
-<dd><ul class="simple">
-<li><p>Se crean los procesos de detección de anomalías secuenciales de la clase Process</p></li>
-</ul>
+<dd><p>Se crean los procesos de detección de anomalías secuenciales de la clase Process</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>am</strong> (<em>object</em>) – Objeto de la clase AnomaliesMethod.</p>
@@ -130,9 +148,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="main.single_process_regression">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">single_process_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#single_process_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.single_process_regression" title="Link to this definition"></a></dt>
-<dd><ul class="simple">
-<li><p>Se crean los procesos de regresion secuenciales de la clase Process</p></li>
-</ul>
+<dd><p>Se crean los procesos de regresion secuenciales de la clase Process</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rm</strong> (<em>object</em>) – Objeto de la clase RegressionMethod.</p>

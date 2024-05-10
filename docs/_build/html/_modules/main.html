@@ -76,6 +76,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span>
 <span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">timeit</span>
+<span class="kn">from</span> <span class="nn">pathos.multiprocessing</span> <span class="kn">import</span> <span class="n">ProcessingPool</span>
 
 <span class="kn">from</span> <span class="nn">techniques.AnomaliesMethods</span> <span class="kn">import</span> <span class="n">AnomaliesMethod</span>
 <span class="kn">from</span> <span class="nn">techniques.RegressionMethods</span> <span class="kn">import</span> <span class="n">RegressionMethod</span>
@@ -86,8 +87,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Preprocesamiento de los datos</span>
 
 <span class="sd">    - Se leen los datos del csv</span>
-<span class="sd">    - Se preprocesan los datos para su posterior análisis</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    - Se preprocesan los datos para su posterior análisis&quot;&quot;&quot;</span>
     <span class="n">weather_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">weather_path</span><span class="p">)</span>
     <span class="n">generation_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">generation_path</span><span class="p">)</span>
     <span class="n">generation_data</span><span class="p">[</span><span class="s1">&#39;DATE_TIME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">generation_data</span><span class="p">[</span><span class="s1">&#39;DATE_TIME&#39;</span><span class="p">],</span><span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">-%m-%Y %H:%M&#39;</span><span class="p">)</span>
@@ -96,67 +96,93 @@
     <span class="k">return</span> <span class="n">df_solar</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DATE_TIME&#39;</span><span class="p">,</span> <span class="s1">&#39;SOURCE_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;DAILY_YIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;TOTAL_YIELD&#39;</span><span class="p">,</span> <span class="s1">&#39;AMBIENT_TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;AC_POWER&#39;</span><span class="p">])</span></div>
 
 
+<div class="viewcode-block" id="create_process">
+<a class="viewcode-back" href="../app.html#main.create_process">[docs]</a>
+<span class="k">def</span> <span class="nf">create_process</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crea las listas de procesos para los modelos de regresión y de detección de anomalías&quot;&quot;&quot;</span>
+    <span class="n">rm1</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">]))</span>
+    <span class="n">rm2</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly&#39;</span><span class="p">]))</span>
+    <span class="n">rm3</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting&#39;</span><span class="p">]))</span>
+    <span class="n">rm4</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf&#39;</span><span class="p">]))</span>
+    <span class="n">process_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">rm1</span><span class="p">,</span><span class="n">rm2</span><span class="p">,</span><span class="n">rm3</span><span class="p">,</span><span class="n">rm4</span><span class="p">]</span>
+
+    <span class="n">am1</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">isolationForest</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">contamination</span><span class="p">,))</span>
+    <span class="n">am2</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">kmeans</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">,))</span>
+    <span class="n">am3</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">autoEncoder</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+    <span class="n">anomalies_process</span> <span class="o">=</span> <span class="p">[</span><span class="n">am1</span><span class="p">,</span><span class="n">am2</span><span class="p">,</span><span class="n">am3</span><span class="p">]</span>
+  
+    <span class="k">return</span> <span class="n">process_list</span><span class="p">,</span> <span class="n">anomalies_process</span> </div>
+
+
+<div class="viewcode-block" id="single_process_anomalies">
+<a class="viewcode-back" href="../app.html#main.single_process_anomalies">[docs]</a>
+<span class="k">def</span> <span class="nf">single_process_anomalies</span><span class="p">(</span><span class="n">am</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Se crean los procesos de detección de anomalías secuenciales de la clase Process</span>
+
+<span class="sd">    :param am: Objeto de la clase AnomaliesMethod.</span>
+<span class="sd">    :type am: object&quot;&quot;&quot;</span>
+    <span class="n">am</span><span class="o">.</span><span class="n">isolationForest</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">contamination</span><span class="p">)</span>
+    <span class="n">am</span><span class="o">.</span><span class="n">kmeans</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">)</span>
+    <span class="n">am</span><span class="o">.</span><span class="n">autoEncoder</span><span class="p">()</span></div>
+
+
 <div class="viewcode-block" id="single_process_regression">
 <a class="viewcode-back" href="../app.html#main.single_process_regression">[docs]</a>
 <span class="k">def</span> <span class="nf">single_process_regression</span><span class="p">(</span><span class="n">rm</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    - Se crean los procesos de regresion secuenciales de la clase Process</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Se crean los procesos de regresion secuenciales de la clase Process</span>
 
 <span class="sd">    :param rm: Objeto de la clase RegressionMethod.</span>
-<span class="sd">    :type rm: object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    :type rm: object&quot;&quot;&quot;</span>
     <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr_pipe&#39;</span><span class="p">],</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">])</span>
     <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly_pipe&#39;</span><span class="p">],</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly&#39;</span><span class="p">])</span>
     <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting_pipe&#39;</span><span class="p">],</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting&#39;</span><span class="p">])</span>
     <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf_pipe&#39;</span><span class="p">],</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="single_process_anomalies">
-<a class="viewcode-back" href="../app.html#main.single_process_anomalies">[docs]</a>
-<span class="k">def</span> <span class="nf">single_process_anomalies</span><span class="p">(</span><span class="n">am</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    - Se crean los procesos de detección de anomalías secuenciales de la clase Process</span>
-
-<span class="sd">    :param am: Objeto de la clase AnomaliesMethod.</span>
-<span class="sd">    :type am: object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">am</span><span class="o">.</span><span class="n">isolationForest</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">contamination</span><span class="p">)</span>
-    <span class="n">am</span><span class="o">.</span><span class="n">kmeans</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">)</span>
-    <span class="n">am</span><span class="o">.</span><span class="n">autoEncoder</span><span class="p">()</span></div>
-
-
 <div class="viewcode-block" id="multi_process_constructor">
 <a class="viewcode-back" href="../app.html#main.multi_process_constructor">[docs]</a>
 <span class="k">def</span> <span class="nf">multi_process_constructor</span><span class="p">(</span><span class="n">procesos</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    - Ejecuta una lista de procesos</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ejecuta una lista de procesos</span>
 
 <span class="sd">    :param procesos: Lista de procesos a ejecutar</span>
-<span class="sd">    :type procesos: list</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    :type procesos: list&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">proceso</span> <span class="ow">in</span> <span class="n">procesos</span><span class="p">:</span>
         <span class="n">proceso</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>    
     <span class="k">for</span> <span class="n">proceso</span> <span class="ow">in</span> <span class="n">procesos</span><span class="p">:</span>
         <span class="n">proceso</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="create_process">
-<a class="viewcode-back" href="../app.html#main.create_process">[docs]</a>
-<span class="k">def</span> <span class="nf">create_process</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    - Crea las listas de procesos para los modelos de regresión</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rm1</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">]))</span>
-    <span class="n">rm2</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly&#39;</span><span class="p">]))</span>
-    <span class="n">rm3</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting&#39;</span><span class="p">]))</span>
-    <span class="n">rm4</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf&#39;</span><span class="p">]))</span>
-    <span class="n">list1</span> <span class="o">=</span> <span class="p">[</span><span class="n">rm1</span><span class="p">,</span><span class="n">rm2</span><span class="p">,</span><span class="n">rm3</span><span class="p">,</span><span class="n">rm4</span><span class="p">]</span>
+<div class="viewcode-block" id="anomalies_process_with_pathos">
+<a class="viewcode-back" href="../app.html#main.anomalies_process_with_pathos">[docs]</a>
+<span class="k">def</span> <span class="nf">anomalies_process_with_pathos</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ejecuta una lista de procesos de detección de anomalías</span>
 
-    <span class="n">am1</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">isolationForest</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">contamination</span><span class="p">,))</span>
-    <span class="n">am2</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">kmeans</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">,))</span>
-    <span class="n">am3</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">autoEncoder</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
-    <span class="n">list2</span> <span class="o">=</span> <span class="p">[</span><span class="n">am1</span><span class="p">,</span><span class="n">am2</span><span class="p">,</span><span class="n">am3</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">list1</span><span class="p">,</span> <span class="n">list2</span></div>
+<span class="sd">    :param procesos: Lista de procesos a ejecutar</span>
+<span class="sd">    :type procesos: list&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">ProcessingPool</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">rm_1</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">am</span><span class="o">.</span><span class="n">isolationForest</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">contamination</span><span class="p">)</span>
+        <span class="n">rm_2</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">am</span><span class="o">.</span><span class="n">kmeans</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">)</span>
+        <span class="n">rm_3</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">am</span><span class="o">.</span><span class="n">autoEncoder</span><span class="p">)</span>
+    <span class="n">procesos</span> <span class="o">=</span> <span class="p">[</span><span class="n">rm_1</span><span class="p">,</span><span class="n">rm_2</span><span class="p">,</span><span class="n">rm_3</span><span class="p">]</span> 
+    <span class="k">for</span> <span class="n">proceso</span> <span class="ow">in</span> <span class="n">procesos</span><span class="p">:</span>
+        <span class="n">proceso</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="regression_process_with_pathos">
+<a class="viewcode-back" href="../app.html#main.regression_process_with_pathos">[docs]</a>
+<span class="k">def</span> <span class="nf">regression_process_with_pathos</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ejecuta una lista de procesos de regresion</span>
+
+<span class="sd">    :param procesos: Lista de procesos a ejecutar</span>
+<span class="sd">    :type procesos: list&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">ProcessingPool</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">rm_1</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;lr&#39;</span><span class="p">])</span>
+        <span class="n">rm_2</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;poly&#39;</span><span class="p">])</span>
+        <span class="n">rm_3</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;gBoosting&#39;</span><span class="p">])</span>
+        <span class="n">rm_4</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apipe</span><span class="p">(</span><span class="n">rm</span><span class="o">.</span><span class="n">adestrarMetodo</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf_pipe&#39;</span><span class="p">],</span> <span class="n">Config</span><span class="o">.</span><span class="n">mr</span><span class="p">[</span><span class="s1">&#39;rf&#39;</span><span class="p">])</span>
+    <span class="n">procesos</span> <span class="o">=</span> <span class="p">[</span><span class="n">rm_1</span><span class="p">,</span><span class="n">rm_2</span><span class="p">,</span><span class="n">rm_3</span><span class="p">,</span><span class="n">rm_4</span><span class="p">]</span> 
+    <span class="k">for</span> <span class="n">proceso</span> <span class="ow">in</span> <span class="n">procesos</span><span class="p">:</span>
+        <span class="n">proceso</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -166,13 +192,15 @@
     <span class="n">rm</span> <span class="o">=</span> <span class="n">RegressionMethod</span><span class="p">(</span><span class="n">df</span> <span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">indepVars</span> <span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">depVars</span><span class="p">)</span>
     <span class="n">am</span> <span class="o">=</span> <span class="n">AnomaliesMethod</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     
-    <span class="n">regression_process_list</span> <span class="p">,</span> <span class="n">anomalies_process_list</span> <span class="o">=</span> <span class="n">create_process</span><span class="p">()</span>
+    <span class="n">process_list</span> <span class="p">,</span> <span class="n">anomalies_process</span> <span class="o">=</span> <span class="n">create_process</span><span class="p">()</span>
 
     <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;single_process_anomalies&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;single_process_anomalies(am)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;anomalies_process_with_constructor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;multi_process_constructor(anomalies_process_list)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;anomalies_process_with_constructor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;multi_process_constructor(anomalies_process)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;anomalies_process_with_pathos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;anomalies_process_with_pathos()&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> 
 
     <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;single_process_regression&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;single_process_regression(rm)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;regression_process_with_constructor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;multi_process_constructor(regression_process_list)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;regression_process_with_constructor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;multi_process_constructor(process_list)&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tiempos</span><span class="p">[</span><span class="s1">&#39;regression_process_with_pathos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;regression_process_with_pathos()&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">(),</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     
     <span class="n">datos</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tiempos</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">datos</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s2">&quot;./src/tiempos.xlsx&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
