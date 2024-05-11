@@ -7,6 +7,7 @@ AnomaliesMethods
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.cluster import KMeans
@@ -14,6 +15,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras import models, layers
+from sklearn.metrics import f1_score
 
 class AnomaliesMethod:
     """Representa las técnicas de detección de anomalías empleadas.
@@ -39,7 +41,27 @@ class AnomaliesMethod:
         model = IsolationForest(contamination=contamination)
         model.fit(X_scaled)
         outliers = model.predict(X_scaled)
-        self.graficarAnomalias(self.df, outliers)    
+        #self.graficarAnomalias(self.df, outliers)
+
+        # Nos inventamos un 1% de datos anomalos y vemos si los clasifica bien
+        # 68774 FILAS ten o dataframe total, 687 FILAS ten o dataframe anomalo
+        filasDf = self.df.shape[0]
+        num_anomalias = round(filasDf * 0.01)
+        f1_results = []
+        for i in range(10):
+            dfanomalo = pd.DataFrame({'DC_POWER':np.random.randint(0.0,28,size=num_anomalias),
+                        'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                        'IRRADIATION':np.random.randint(0.0,171,size=num_anomalias)})
+            
+            Y = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+            df_train = StandardScaler().fit_transform(pd.concat([self.df, dfanomalo], ignore_index=True))
+            model.fit(df_train); Y_pred = model.predict(df_train)
+            Y_pred[Y_pred == 1] = 0; Y_pred[Y_pred == -1] = 1
+            f1_results.append(f1_score(Y, Y_pred))
+
+        f1_results = np.array(f1_results)
+        mean = np.mean(f1_results); std = np.std(f1_results)
+        print("media F1: " + str(mean) + " std: " + str(std))   
 
     def graficarAnomalias(self,data,outliers):
         """
@@ -89,7 +111,7 @@ class AnomaliesMethod:
         cluster_centers = model.cluster_centers_
         distances = [np.linalg.norm(x - cluster_centers[cluster]) for x, cluster in zip(X_scaled, cluster_labels)]
 
-        percentile_threshold = 99.5
+        percentile_threshold = 99.0
         threshold_distance = np.percentile(distances, percentile_threshold)
 
         anomalies = [X_scaled[i] for i, distance in enumerate(distances) if distance > threshold_distance]
@@ -107,6 +129,32 @@ class AnomaliesMethod:
         plt.xlabel('MODULE_TEMPERATURE'); plt.ylabel('DC_POWER'); plt.title('MODULE_TEMPERATURE vs DC_POWER'); plt.legend()
         plt.tight_layout()
         plt.show()
+
+        filasDf = self.df.shape[0]
+        #print(" Forma das anomalias " + str(anomalies2.shape) + " Primeros 10 elementos: " + str(anomalies2[-10:]))ape[0]
+        num_anomalias = round(filasDf * 0.01)
+        f1_results = []
+        for i in range(10):
+            dfanomalo = pd.DataFrame({'DC_POWER':np.random.randint(0.0,28,size=num_anomalias),
+                        'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                        'IRRADIATION':np.random.randint(0.0,171,size=num_anomalias)})
+            
+            Y = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+            df_train = StandardScaler().fit_transform(pd.concat([self.df, dfanomalo], ignore_index=True))
+            model.fit(df_train)
+            cluster_labels = model.predict(df_train)
+            cluster_centers = model.cluster_centers_
+            distances = [np.linalg.norm(x - cluster_centers[cluster]) for x, cluster in zip(df_train, cluster_labels)]
+            threshold_distance = np.percentile(distances, percentile_threshold)
+            #Y_pred = model.predict(df_train)
+            Y_pred = np.array(np.where((distances > threshold_distance), 1, 0))
+            #Y_pred[Y_pred == 1] = 0; Y_pred[Y_pred == -1] = 1
+            f1_results.append(f1_score(Y, Y_pred))
+
+        f1_results = np.array(f1_results)
+        print(f1_results)
+        mean = np.mean(f1_results); std = np.std(f1_results)
+        print("media F1: " + str(mean) + " std: " + str(std))
 
     def autoEncoder(self):
         """
@@ -150,6 +198,26 @@ class AnomaliesMethod:
         plt.plot(range(X_train_scaled.shape[0]+1,X_train_scaled.shape[0]+X_test_scaled.shape[0]+1),mse_test,'r.')
         plt.axhline(umbral, color='r', linestyle='--')
         plt.xlabel('Índice del dato')
-        plt.ylabel('Error de reconstrucción');
+        plt.ylabel('Error de reconstrucción')
         plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
         plt.show()
+
+        filasDf = self.df.shape[0]
+        num_anomalias = round(filasDf * 0.01)
+        f1_results = []
+        for i in range(10):
+            dfanomalo = pd.DataFrame({'IRRADIATION':np.random.randint(30,100,size=num_anomalias),
+                        'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                        'DC_POWER':np.random.randint(0,10,size=num_anomalias)})
+            salidas = StandardScaler().fit_transform(pd.concat([self.df, dfanomalo], ignore_index=True)[['DC_POWER']])
+            X_test_a = StandardScaler().fit_transform(pd.concat([self.df, dfanomalo], ignore_index=True).drop(columns=['DC_POWER']))
+            Y_test_a = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+            e_test_a = autoencoder.predict(X_test_a)
+            mse_test_a = np.mean(np.power(salidas - e_test_a, 2), axis=1)
+            Y_pred_a = np.array(np.where((mse_test_a > umbral), 1, 0))
+            f1_results.append(f1_score(Y_test_a, Y_pred_a))
+
+        f1_results = np.array(f1_results)
+        print(f1_results)
+        mean = np.mean(f1_results); std = np.std(f1_results)
+        print("media F1: " + str(mean) + " std: " + str(std))
