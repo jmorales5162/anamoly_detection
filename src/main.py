@@ -100,12 +100,12 @@ if __name__ == "__main__":
     process_list , anomalies_process = create_process()
 
     tiempos['single_process_anomalies'] = timeit("single_process_anomalies(am)", globals=globals(), number=1)
-    #tiempos['anomalies_process_with_constructor'] = timeit("multi_process_constructor(anomalies_process)", globals=globals(), number=1)
-    #tiempos['anomalies_process_with_pathos'] = timeit("anomalies_process_with_pathos()", globals=globals(), number=1) 
+    tiempos['anomalies_process_with_constructor'] = timeit("multi_process_constructor(anomalies_process)", globals=globals(), number=1)
+    tiempos['anomalies_process_with_pathos'] = timeit("anomalies_process_with_pathos()", globals=globals(), number=1) 
 
-    #tiempos['single_process_regression'] = timeit("single_process_regression(rm)", globals=globals(), number=1)
-    #tiempos['regression_process_with_constructor'] = timeit("multi_process_constructor(process_list)", globals=globals(), number=1)
-    #tiempos['regression_process_with_pathos'] = timeit("regression_process_with_pathos()", globals=globals(), number=1)
+    tiempos['single_process_regression'] = timeit("single_process_regression(rm)", globals=globals(), number=1)
+    tiempos['regression_process_with_constructor'] = timeit("multi_process_constructor(process_list)", globals=globals(), number=1)
+    tiempos['regression_process_with_pathos'] = timeit("regression_process_with_pathos()", globals=globals(), number=1)
     
     datos = pd.DataFrame(tiempos, index=[0])
     datos.to_excel("./src/tiempos.xlsx", index=False)
