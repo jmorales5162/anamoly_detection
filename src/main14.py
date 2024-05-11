@@ -159,29 +159,68 @@ def autoEncoder(df):
           shuffle=True)
     
     mse_train = tf.keras.losses.mse(autoencoder.predict(X_train_scaled), X_train_scaled)
-    umbral = np.max(mse_train)
+    threshold = np.max(mse_train)
 
     plt.figure(figsize=(12,4))
     plt.hist(mse_train, bins=50)
     plt.xlabel("Error de reconstrucción (entrenamiento)")
     plt.ylabel("Número de datos")
-    plt.axvline(umbral, color='r', linestyle='--')
+    plt.axvline(threshold, color='r', linestyle='--')
     plt.legend(["Umbral"], loc="upper center")
     plt.show()
     e_test = autoencoder.predict(X_test_scaled)
+    print("AAAAA: " + str(e_test))
 
     mse_test = np.mean(np.power(X_test_scaled - e_test, 2), axis=1)
+    print("AAAAA(Forma): " + str(e_test.shape) + "AAAAA(Forma): " + str(e_test.shape))
+
+    # Classify instances as anomalies based on the threshold
+   
+    #predicted_labels_train = (mse_train > threshold).astype(int)
+    #predicted_labels_test = (mse_test > threshold).astype(int)
+    #print("Elementos anomalos: " + str(np.count_nonzero(predicted_labels_test)))
+
+    filasDf = df.shape[0]
+    num_anomalias = round(filasDf * 0.01)
+    f1_results = []
+    for i in range(10):
+        dfanomalo = pd.DataFrame({'IRRADIATION':np.random.randint(30,100,size=num_anomalias),
+                    'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                    'DC_POWER':np.random.randint(0,10,size=num_anomalias)})
+        salidas = StandardScaler().fit_transform(pd.concat([df, dfanomalo], ignore_index=True)[['DC_POWER']])
+        X_test_a = StandardScaler().fit_transform(pd.concat([df, dfanomalo], ignore_index=True).drop(columns=['DC_POWER']))
+        Y_test_a = np.concatenate([np.zeros(filasDf, dtype=int), np.ones(num_anomalias, dtype=int)])
+        #X_test_a = X_test_a.drop(columns = ['DC_POWER'])
+        #X_test_a_scaled = scaler.fit_transform(X_test_a.to_numpy())
+        e_test_a = autoencoder.predict(X_test_a)
+        print("Salida:  " + str(e_test_a))
+        mse_test_a = np.mean(np.power(salidas - e_test_a, 2), axis=1)
+        predicted_labels_test = np.array(np.where((mse_test > threshold), 1, 0))
+        predicted_labels_test_a = np.array(np.where((mse_test_a > threshold), 1, 0))
+
+        #print("Numero de anomalias test: " + str(np.count_nonzero(predicted_labels_test == 1, axis=0)))
+        #print("Numero de anomalias testA: " + str(np.count_nonzero(predicted_labels_test_a == 1, axis=0)))
+        Y_pred_a = np.array(np.where((mse_test_a > threshold), 1, 0))
+        #print(f1_score(Y_test_a, Y_pred_a))
+        f1_results.append(f1_score(Y_test_a, Y_pred_a))
+
+    f1_results = np.array(f1_results)
+    print(f1_results)
+    mean = np.mean(f1_results); std = np.std(f1_results)
+    print("media F1: " + str(mean) + " std: " + str(std))
+
+    
     plt.figure(figsize=(12,4))
     plt.plot(range(1,X_train_scaled.shape[0]+1),mse_train,'b.')
     plt.plot(range(X_train_scaled.shape[0]+1,X_train_scaled.shape[0]+X_test_scaled.shape[0]+1),mse_test,'r.')
-    plt.axhline(umbral, color='r', linestyle='--')
+    plt.axhline(threshold, color='r', linestyle='--')
     plt.xlabel('Índice del dato')
     plt.ylabel('Error de reconstrucción')
     plt.legend(["Entrenamiento", "Test", "Umbral"], loc="upper left")
     plt.show()
 
     # COmo faso
-
+    """
     filasDf = df.shape[0]
     num_anomalias = round(filasDf * 0.01)
     f1_results = []
@@ -199,6 +238,41 @@ def autoEncoder(df):
     f1_results = np.array(f1_results)
     mean = np.mean(f1_results); std = np.std(f1_results)
     print("media F1: " + str(mean) + " std: " + str(std))
+    """
+
+
+def autoencoder2(df):
+    num_anomalias = round(df.shape[0] * 0.2) # 20% datos anomalos
+    X_anomalo = pd.DataFrame({'IRRADIATION':np.random.randint(0.0,28,size=num_anomalias),
+                    'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                    'DC_POWER':np.random.randint(0.0,56,size=num_anomalias)})
+    
+    x_train, x_test, y_train, y_test = train_test_split(df.to_numpy(), df[['DC_POWER']].to_numpy(), test_size=0.2, random_state=111)
+    scaler = StandardScaler()
+
+    pd.concat([x_test, dfanomalo], ignore_index=True)
+
+    dfanomalo = pd.DataFrame({'DC_POWER':np.random.randint(0.0,28,size=num_anomalias),
+                    'MODULE_TEMPERATURE':np.random.randint(0.0,56,size=num_anomalias),
+                    'IRRADIATION':np.random.randint(0.0,171,size=num_anomalias)})
+    X_train_scaled = scaler.fit_transform(x_train)
+    X_test_scaled = scaler.fit_transform(x_test)
+    Y_train_scaled = scaler.fit_transform(x_train)
+    Y_test_scaled = scaler.fit_transform(x_test)
+    autoencoder = models.Sequential()
+    autoencoder.add(layers.Dense(1, input_shape=X_train_scaled.shape[1:], activation='relu'))
+    autoencoder.add(layers.Dense(2))
+    autoencoder.compile(optimizer='adam', loss='mse')
+    autoencoder.summary()
+    history = autoencoder.fit(X_train_scaled, Y_train_scaled, 
+          epochs=30, 
+          batch_size=100,
+          validation_data=(X_test_scaled, Y_test_scaled),
+          shuffle=True)
+    
+    mse_train = tf.keras.losses.mse(autoencoder.predict(X_train_scaled), X_train_scaled)
+    threshold = np.max(mse_train)
+
 
 
 def adestrarMetodo(df, model, nome, depVars, indepVars):
