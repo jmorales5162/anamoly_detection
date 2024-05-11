@@ -40,7 +40,7 @@ def multi_process_regression_pathos():
         #resultado2 = pool.apipe(adestrarMetodo, Config.path, Config.mr['poly_pipe'], Config.mr['poly'], Config.depVars, Config.indepVars)
         resultado3 = pool.apipe(adestrarMetodo, Config.path, Config.mr['gBoosting_pipe'], Config.mr['gBoosting'], Config.depVars, Config.indepVars)
         #resultado4 = pool.apipe(adestrarMetodo, Config.path, Config.mr['rf_pipe'], Config.mr['rf'], Config.depVars, Config.indepVars)
-        
+        print(resultado3)
         # Esperar a que finalicen las funciones y obtener los resultados
         #resultado1.get()
         #resultado2.get()
@@ -65,9 +65,9 @@ if __name__ == "__main__":
     
     tiempos = {}
 
-    tiempos['single_process'] = timeit("single_process_regression()", globals=globals(), number=1)
+    #tiempos['single_process'] = timeit("single_process_regression()", globals=globals(), number=1)
     tiempos['process_with_pathos'] = timeit("multi_process_regression_pathos()", globals=globals(), number=1)
-    tiempos['process_with_constructor'] = timeit("multi_process_regression_constructor()", globals=globals(), number=1)
+    #tiempos['process_with_constructor'] = timeit("multi_process_regression_constructor()", globals=globals(), number=1)
 
     for metodo,tiempo in tiempos.items():
         print(f"Tiempo de ejecución para {metodo}: {tiempo/60:.2f} min")

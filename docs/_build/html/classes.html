@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Welcome to Regression_techniques’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Main" href="app.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,14 +45,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="app.html">Main</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Techniques</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-techniques.clase">Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#clase-prueba">Clase_prueba</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#techniques.clase.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#techniques.clase.Client.add_new_boat"><code class="docutils literal notranslate"><span class="pre">Client.add_new_boat()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#techniques.clase.Client.dni"><code class="docutils literal notranslate"><span class="pre">Client.dni</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#techniques.clase.Client.remove_boat"><code class="docutils literal notranslate"><span class="pre">Client.remove_boat()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#techniques.clase.Client.show_details"><code class="docutils literal notranslate"><span class="pre">Client.show_details()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-techniques.AnomaliesMethods">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anomaliesmethods">AnomaliesMethods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#techniques.AnomaliesMethods.AnomaliesMethod"><code class="docutils literal notranslate"><span class="pre">AnomaliesMethod</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.AnomaliesMethods.AnomaliesMethod.autoEncoder"><code class="docutils literal notranslate"><span class="pre">AnomaliesMethod.autoEncoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.AnomaliesMethods.AnomaliesMethod.graficarAnomalias"><code class="docutils literal notranslate"><span class="pre">AnomaliesMethod.graficarAnomalias()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.AnomaliesMethods.AnomaliesMethod.isolationForest"><code class="docutils literal notranslate"><span class="pre">AnomaliesMethod.isolationForest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.AnomaliesMethods.AnomaliesMethod.kmeans"><code class="docutils literal notranslate"><span class="pre">AnomaliesMethod.kmeans()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#regressionmethods">RegressionMethods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#techniques.RegressionMethods.RegressionMethod"><code class="docutils literal notranslate"><span class="pre">RegressionMethod</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.RegressionMethods.RegressionMethod.adestrarMetodo"><code class="docutils literal notranslate"><span class="pre">RegressionMethod.adestrarMetodo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.RegressionMethods.RegressionMethod.cross_validation_regression"><code class="docutils literal notranslate"><span class="pre">RegressionMethod.cross_validation_regression()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#techniques.RegressionMethods.RegressionMethod.graficarResultados"><code class="docutils literal notranslate"><span class="pre">RegressionMethod.graficarResultados()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -87,70 +95,150 @@
              
   <section id="techniques">
 <h1>Techniques<a class="headerlink" href="#techniques" title="Link to this heading"></a></h1>
-<section id="module-techniques.clase">
-<span id="classes"></span><h2>Classes<a class="headerlink" href="#module-techniques.clase" title="Link to this heading"></a></h2>
-<section id="clase-prueba">
-<h3>Clase_prueba<a class="headerlink" href="#clase-prueba" title="Link to this heading"></a></h3>
+<section id="module-techniques.AnomaliesMethods">
+<span id="classes"></span><h2>Classes<a class="headerlink" href="#module-techniques.AnomaliesMethods" title="Link to this heading"></a></h2>
+<section id="anomaliesmethods">
+<h3>AnomaliesMethods<a class="headerlink" href="#anomaliesmethods" title="Link to this heading"></a></h3>
 </section>
 <dl class="py class">
-<dt class="sig sig-object py" id="techniques.clase.Client">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">techniques.clase.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dni</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/clase.html#Client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.clase.Client" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="techniques.AnomaliesMethods.AnomaliesMethod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">techniques.AnomaliesMethods.</span></span><span class="sig-name descname"><span class="pre">AnomaliesMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/AnomaliesMethods.html#AnomaliesMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.AnomaliesMethods.AnomaliesMethod" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Representa un cliente.</p>
+<p>Representa las técnicas de detección de anomalías empleadas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>dataframe</em>) – Dataframe de datos a analizar</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="techniques.AnomaliesMethods.AnomaliesMethod.autoEncoder">
+<span class="sig-name descname"><span class="pre">autoEncoder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/AnomaliesMethods.html#AnomaliesMethod.autoEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.AnomaliesMethods.AnomaliesMethod.autoEncoder" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Normaliza los datos de entrada</p></li>
+<li><p>Entrena y predice una red autoncoder</p></li>
+<li><p>Grafica las anomalias encontradas en el conjunto de datos</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="techniques.AnomaliesMethods.AnomaliesMethod.graficarAnomalias">
+<span class="sig-name descname"><span class="pre">graficarAnomalias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outliers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/AnomaliesMethods.html#AnomaliesMethod.graficarAnomalias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.AnomaliesMethods.AnomaliesMethod.graficarAnomalias" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Grafica las anomalias encontradas en el conjunto de datos</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>client_num</strong> (<em>string</em>) – Número de cliente.</p></li>
-<li><p><strong>dni</strong> (<em>string</em>) – DNI del cliente.</p></li>
-<li><p><strong>name</strong> (<em>string</em>) – Nombre del cliente.</p></li>
-<li><p><strong>phone</strong> (<em>string</em>) – Teléfono del cliente.</p></li>
-<li><p><strong>boats</strong> (<em>dict</em>) – Barcos del cliente.</p></li>
+<li><p><strong>data</strong> (<em>float</em>) – Datos a graficar.</p></li>
+<li><p><strong>outliers</strong> (<em>float</em>) – Anomalías detectadas.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="techniques.AnomaliesMethods.AnomaliesMethod.isolationForest">
+<span class="sig-name descname"><span class="pre">isolationForest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contamination</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/AnomaliesMethods.html#AnomaliesMethod.isolationForest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.AnomaliesMethods.AnomaliesMethod.isolationForest" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Normaliza los datos de entrada</p></li>
+<li><p>Entrena y predice un modelo IsolationForest</p></li>
+<li><p>Grafica las anomalias encontradas en el conjunto de datos</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>contamination</strong> (<em>float</em>) – Grado de contaminación del modelo [0-1].</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="techniques.AnomaliesMethods.AnomaliesMethod.kmeans">
+<span class="sig-name descname"><span class="pre">kmeans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/AnomaliesMethods.html#AnomaliesMethod.kmeans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.AnomaliesMethods.AnomaliesMethod.kmeans" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Normaliza los datos de entrada</p></li>
+<li><p>Entrena y predice un modelo KMeans</p></li>
+<li><p>Grafica las anomalias encontradas en el conjunto de datos</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_clusters</strong> (<em>int</em>) – Cantidad de clusters en los que se desea dividir los datos.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="regressionmethods">
+<span id="module-techniques.RegressionMethods"></span><h3>RegressionMethods<a class="headerlink" href="#regressionmethods" title="Link to this heading"></a></h3>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="techniques.RegressionMethods.RegressionMethod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">techniques.RegressionMethods.</span></span><span class="sig-name descname"><span class="pre">RegressionMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indepVars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depVars</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/RegressionMethods.html#RegressionMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.RegressionMethods.RegressionMethod" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Representa las métodos de regresión empleadas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>list</em>) – Dataframe de datos a analizar</p></li>
+<li><p><strong>indepVars</strong> – Variables independientes</p></li>
+<li><p><strong>depVars</strong> – Variables dependientes</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="techniques.clase.Client.add_new_boat">
-<span class="sig-name descname"><span class="pre">add_new_boat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/clase.html#Client.add_new_boat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.clase.Client.add_new_boat" title="Link to this definition"></a></dt>
-<dd><p>Añade un nuevo barco a la lista de barcos del cliente.</p>
+<dt class="sig sig-object py" id="techniques.RegressionMethods.RegressionMethod.adestrarMetodo">
+<span class="sig-name descname"><span class="pre">adestrarMetodo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nome</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/RegressionMethods.html#RegressionMethod.adestrarMetodo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.RegressionMethods.RegressionMethod.adestrarMetodo" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Normaliza los datos de entrada</p></li>
+<li><p>Realiza la validación cruzada de los datos</p></li>
+<li><p>Entrena el modelo</p></li>
+<li><p>Grafica los resultados</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>boat</strong> (<em>Boat</em>) – Un objeto barco.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="techniques.clase.Client.dni">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dni</span></span><a class="headerlink" href="#techniques.clase.Client.dni" title="Link to this definition"></a></dt>
-<dd><p>Dni del cliente.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Getter<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Devuelve el dni del cliente</p>
-</dd>
-<dt class="field-even">Setter<span class="colon">:</span></dt>
-<dd class="field-even"><p>Comprueba el dni y si no es correcto,lanza una excepción</p>
-</dd>
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>string</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>objeto Pipeline</em>) – Modelo a procesar</p></li>
+<li><p><strong>nome</strong> (<em>string</em>) – Nombre del modelo a procesar</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="techniques.clase.Client.remove_boat">
-<span class="sig-name descname"><span class="pre">remove_boat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/clase.html#Client.remove_boat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.clase.Client.remove_boat" title="Link to this definition"></a></dt>
-<dd><p>Elimina un barco de la lista de barcos del cliente.</p>
+<dt class="sig sig-object py" id="techniques.RegressionMethods.RegressionMethod.cross_validation_regression">
+<span class="sig-name descname"><span class="pre">cross_validation_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/RegressionMethods.html#RegressionMethod.cross_validation_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.RegressionMethods.RegressionMethod.cross_validation_regression" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Realiza la validación cruzada</p></li>
+<li><p>Guarda metricas en un fichero .txt</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>boat</strong> (<em>Boat</em>) – Un objeto barco.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>objeto Pipeline</em>) – Modelo a procesar</p></li>
+<li><p><strong>X</strong> – Datos de entrada</p></li>
+<li><p><strong>y</strong> – Datos de salida</p></li>
+<li><p><strong>model_name</strong> (<em>string</em>) – Nombre del modelo</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="techniques.clase.Client.show_details">
-<span class="sig-name descname"><span class="pre">show_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/clase.html#Client.show_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.clase.Client.show_details" title="Link to this definition"></a></dt>
-<dd><p>Muestra por pantalla los datos de un cliente</p>
+<dt class="sig sig-object py" id="techniques.RegressionMethods.RegressionMethod.graficarResultados">
+<span class="sig-name descname"><span class="pre">graficarResultados</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/techniques/RegressionMethods.html#RegressionMethod.graficarResultados"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#techniques.RegressionMethods.RegressionMethod.graficarResultados" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>Grafica los resultados</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modelo</strong> (<em>objeto Pipeline</em>) – Modelo a procesar</p></li>
+<li><p><strong>nombre</strong> (<em>string</em>) – Nombre del modelo</p></li>
+<li><p><strong>X</strong> – Datos de entrada</p></li>
+<li><p><strong>Y</strong> – Datos de salida</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -162,7 +250,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Regression_techniques’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="app.html" class="btn btn-neutral float-left" title="Main" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

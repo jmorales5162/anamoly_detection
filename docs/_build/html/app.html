@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alquiler &mdash; Regression_techniques 0.0.1 documentation</title>
+  <title>Main &mdash; Regression_techniques 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,7 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Techniques" href="classes.html" /> 
+    <link rel="next" title="Techniques" href="classes.html" />
+    <link rel="prev" title="Welcome to Regression_techniques’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,11 +46,17 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="classes.html">Techniques</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Alquiler</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#regression-techniques">Regression Techniques</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Main</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main.anomalies_process_with_pathos"><code class="docutils literal notranslate"><span class="pre">anomalies_process_with_pathos()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.create_process"><code class="docutils literal notranslate"><span class="pre">create_process()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.multi_process_constructor"><code class="docutils literal notranslate"><span class="pre">multi_process_constructor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.process_df"><code class="docutils literal notranslate"><span class="pre">process_df()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.regression_process_with_pathos"><code class="docutils literal notranslate"><span class="pre">regression_process_with_pathos()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.single_process_anomalies"><code class="docutils literal notranslate"><span class="pre">single_process_anomalies()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main.single_process_regression"><code class="docutils literal notranslate"><span class="pre">single_process_regression()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="classes.html">Techniques</a></li>
 </ul>
 
         </div>
@@ -66,7 +73,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Alquiler</li>
+      <li class="breadcrumb-item active">Main</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/app.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -76,24 +83,87 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-test">
-<span id="alquiler"></span><h1>Alquiler<a class="headerlink" href="#module-test" title="Link to this heading"></a></h1>
-<section id="regression-techniques">
-<h2>Regression Techniques<a class="headerlink" href="#regression-techniques" title="Link to this heading"></a></h2>
-<p>En esta aplicacion se implementaran tecnicas de regresion como son :</p>
+  <section id="module-main">
+<span id="main"></span><h1>Main<a class="headerlink" href="#module-main" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="main.anomalies_process_with_pathos">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">anomalies_process_with_pathos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#anomalies_process_with_pathos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.anomalies_process_with_pathos" title="Link to this definition"></a></dt>
+<dd><p>Ejecuta una lista de procesos de detección de anomalías</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>procesos</strong> (<em>list</em>) – Lista de procesos a ejecutar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.create_process">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">create_process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#create_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.create_process" title="Link to this definition"></a></dt>
+<dd><p>Crea las listas de procesos para los modelos de regresión y de detección de anomalías</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.multi_process_constructor">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">multi_process_constructor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">procesos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#multi_process_constructor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.multi_process_constructor" title="Link to this definition"></a></dt>
+<dd><p>Ejecuta una lista de procesos</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>procesos</strong> (<em>list</em>) – Lista de procesos a ejecutar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.process_df">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">process_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#process_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.process_df" title="Link to this definition"></a></dt>
+<dd><p>Preprocesamiento de los datos</p>
 <ul class="simple">
-<li><p>Modelos Autoncoder</p></li>
-<li><p>Isolation Forest</p></li>
-<li><p>Kmeans</p></li>
+<li><p>Se leen los datos del csv</p></li>
+<li><p>Se preprocesan los datos para su posterior análisis</p></li>
 </ul>
-</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.regression_process_with_pathos">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">regression_process_with_pathos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#regression_process_with_pathos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.regression_process_with_pathos" title="Link to this definition"></a></dt>
+<dd><p>Ejecuta una lista de procesos de regresion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>procesos</strong> (<em>list</em>) – Lista de procesos a ejecutar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.single_process_anomalies">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">single_process_anomalies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">am</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#single_process_anomalies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.single_process_anomalies" title="Link to this definition"></a></dt>
+<dd><p>Se crean los procesos de detección de anomalías secuenciales de la clase Process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>am</strong> (<em>object</em>) – Objeto de la clase AnomaliesMethod.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.single_process_regression">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">single_process_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#single_process_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.single_process_regression" title="Link to this definition"></a></dt>
+<dd><p>Se crean los procesos de regresion secuenciales de la clase Process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rm</strong> (<em>object</em>) – Objeto de la clase RegressionMethod.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="classes.html" class="btn btn-neutral float-left" title="Techniques" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Regression_techniques’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classes.html" class="btn btn-neutral float-right" title="Techniques" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
